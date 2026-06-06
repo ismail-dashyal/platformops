@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBM MAS 9.1 Single-Node On-Premises Architecture</title>
+<style>
+/* Modern CSS Variables Palette */
+:root {
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+  --color-background-info: #eff6ff;
+  --color-background-warning: #fffbeb;
+  --color-background-danger: #fef2f2;
+  
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94a3b8;
+  --color-text-info: #1d4ed8;
+  --color-text-success: #166534;
+  --color-text-warning: #92400e;
+  --color-text-danger: #991b1b;
+  
+  --color-border-primary: #cbd5e1;
+  --color-border-secondary: #e2e8f0;
+  --color-border-tertiary: #f1f5f9;
+  --color-border-info: #bfdbfe;
+  --color-border-warning: #fde68a;
+  --color-border-danger: #fecaca;
+  
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --transition-speed: 0.2s;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 20px;
+}
+
+.arch-wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--color-background-primary);
+  padding: 24px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  font-size: 14px;
+}
+
+/* Typography Enhancements */
+.sr-only { display: none; }
+h2.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border-secondary);
+  padding-bottom: 12px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-border-secondary);
+  padding-bottom: 8px;
+}
+.tab {
+  padding: 8px 16px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  transition: all var(--transition-speed) ease;
+}
+.tab:hover {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+}
+.tab.active {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  box-shadow: inset 0 0 0 1px var(--color-border-info);
+}
+
+.panel {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Layer Containers */
+.layer {
+  border: 1px solid var(--color-border-secondary);
+  border-left-width: 4px;
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 16px;
+  background: var(--color-background-primary);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-speed);
+}
+.layer:hover {
+  box-shadow: var(--shadow-md);
+}
+.layer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--color-background-primary);
+  border-bottom: 1px solid transparent;
+  transition: background var(--transition-speed);
+}
+.layer-header:hover {
+  background: var(--color-background-secondary);
+}
+.layer-header.open {
+  border-bottom-color: var(--color-border-secondary);
+}
+.layer-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.layer-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+.layer-sub {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  display: none;
+}
+@media (min-width: 768px) {
+  .layer-sub { display: block; }
+}
+.layer-body {
+  padding: 16px;
+  background: var(--color-background-secondary);
+}
+.layer-body.closed { display: none; }
+
+/* Boxes Grid */
+.boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.box {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.box:hover {
+  border-color: var(--color-text-tertiary);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.box-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+.box-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  flex-grow: 1;
+}
+.box-tag {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 10px;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  align-self: flex-start;
+}
+
+/* Detail Panel */
+.detail {
+  background: var(--color-background-info);
+  border: 1px solid var(--color-border-info);
+  border-radius: var(--border-radius-md);
+  padding: 16px 20px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  display: none;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s ease-in-out;
+}
+.detail.open { display: block; }
+.detail-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color var(--transition-speed);
+}
+.detail-close:hover { color: var(--color-text-primary); }
+.detail h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-info);
+  margin: 0 0 10px;
+  padding-right: 20px;
+}
+.detail ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.detail li { margin-bottom: 6px; }
+.btn-ai {
+  margin-top: 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-border-info);
+  color: var(--color-text-info);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+}
+.btn-ai:hover {
+  background: var(--color-text-info);
+  color: #ffffff;
+}
+
+/* Flow Diagram */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  padding: 16px;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  border: 1px dashed var(--color-border-secondary);
+}
+.fbox {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+.farr {
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+  font-weight: bold;
+}
+
+/* Tables */
+.atbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 12px;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.atbl th {
+  background: var(--color-background-secondary);
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border-secondary);
+  color: var(--color-text-primary);
+}
+.atbl td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary);
+}
+.atbl tr:last-child td { border-bottom: none; }
+.atbl tr:nth-child(even) td { background: var(--color-background-primary); }
+.atbl tr:nth-child(odd) td { background: var(--color-background-primary); }
+.atbl tr:hover td { background: var(--color-background-tertiary); }
+.tick { color: var(--color-text-success); font-weight: bold; text-align: center; }
+.dash { color: var(--color-text-tertiary); text-align: center; }
+
+/* Namespace Grid */
+.ns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.ns-box {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.ns-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-info);
+  font-family: var(--font-mono);
+  margin-bottom: 4px;
+}
+.ns-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Helper Classes */
+.info-box {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  background: var(--color-background-info);
+  border-left: 4px solid var(--color-text-info);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+code {
+  font-family: var(--font-mono);
+  background: var(--color-background-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-secondary);
+  font-size: 0.9em;
+  color: #c53030;
+}
+.badge-warning {
+  background: #fef08a;
+  color: #854d0e;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  border: 1px solid #fde047;
+}
+</style>
+</head>
+<body>
+
+<div class="arch-wrap">
+<h2 class="title">IBM MAS 9.1 Single-Node On-Premises Architecture</h2>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview')">Full stack overview</div>
+  <div class="tab" onclick="switchTab('infra')">Infrastructure layer</div>
+  <div class="tab" onclick="switchTab('ocp')">OpenShift layer</div>
+  <div class="tab" onclick="switchTab('prereqs')">MAS prerequisites</div>
+  <div class="tab" onclick="switchTab('mas')">MAS core & apps</div>
+  <div class="tab" onclick="switchTab('users')">User access & auth</div>
+  <div class="tab" onclick="switchTab('network')">Networking & DNS</div>
+</div>
+
+<div id="tab-overview" class="panel active">
+  <div class="info-box" style="background:var(--color-background-secondary); border-left-color:var(--color-text-tertiary);">
+    IBM MAS 9.1 on your <strong>Single-Node OpenShift (SNO)</strong> deployment — Ryzen 9 9950X3D · 256 GB DDR5 · RTX 5070 · bare metal. Each layer depends on everything below it. Click any header to expand, any box to see details.
+    
+  </div>
+
+  <div class="layer" style="border-left-color:#B4B2A9">
+    <div class="layer-header" onclick="toggleLayer('l8')">
+      <span class="layer-badge" style="background:#F1EFE8;color:#5F5E5A">External</span>
+      <span class="layer-title">External services (outside the cluster)</span>
+      <span class="layer-sub">Load balancers · DNS · LDAP/AD · SAML IdP · SMTP · Bastion</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l8-arrow">▼</span>
+    </div>
+    <div id="l8-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('load-balancers')">
+          <div class="box-title">Load balancers</div>
+          <div class="box-desc">Route traffic into OCP — one for API (6443), one for apps (443)</div>
+          <span class="box-tag" style="background:#F1EFE8;color:#5F5E5A">required</span>
+        </div>
+        <div class="box" onclick="showDetail('dns')">
+          <div class="box-title">DNS server</div>
+          <div class="box-desc">~20 wildcard records all pointing to OCP ingress LB</div>
+          <span class="box-tag" style="background:#F1EFE8;color:#5F5E5A">required</span>
+        </div>
+        <div class="box" onclick="showDetail('ldap')">
+          <div class="box-title">LDAP / Active Directory</div>
+          <div class="box-desc">Corporate user directory — MAS syncs users from here</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#3B6D11">optional</span>
+        </div>
+        <div class="box" onclick="showDetail('saml')">
+          <div class="box-title">SAML identity provider</div>
+          <div class="box-desc">SSO with other enterprise apps — users don't re-login</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#3B6D11">optional</span>
+        </div>
+        <div class="box" onclick="showDetail('smtp')">
+          <div class="box-title">SMTP server</div>
+          <div class="box-desc">MAS sends email notifications through this</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#3B6D11">optional</span>
+        </div>
+        <div class="box" onclick="showDetail('bastion')">
+          <div class="box-title">Bastion host</div>
+          <div class="box-desc">Linux VM outside cluster — runs install commands and oc CLI</div>
+          <span class="box-tag" style="background:#F1EFE8;color:#5F5E5A">required</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#AFA9EC">
+    <div class="layer-header" onclick="toggleLayer('l7')">
+      <span class="layer-badge" style="background:#EEEDFE;color:#534AB7">MAS apps</span>
+      <span class="layer-title">Maximo applications (what users actually use)</span>
+      <span class="layer-sub">Manage · Monitor · Health · Predict · Visual Inspection · Collaborate · Optimizer · Real Estate</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l7-arrow">▼</span>
+    </div>
+    <div id="l7-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('manage')"><div class="box-title">Maximo Manage</div><div class="box-desc">Core EAM/CMMS — assets, work orders, inventory</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">needs Db2 + MongoDB</span></div>
+        <div class="box" onclick="showDetail('monitor')"><div class="box-title">Maximo Monitor</div><div class="box-desc">IoT device monitoring, dashboards, alerts</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">needs Kafka + Db2</span></div>
+        <div class="box" onclick="showDetail('health')"><div class="box-title">Maximo Health</div><div class="box-desc">Asset health scoring and condition monitoring</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">needs CP4D</span></div>
+        <div class="box" onclick="showDetail('predict')"><div class="box-title">Maximo Predict</div><div class="box-desc">AI-based failure prediction models</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">needs CP4D + Watson</span></div>
+        <div class="box" onclick="showDetail('mvi')"><div class="box-title">Visual Inspection</div><div class="box-desc">Computer vision for asset inspection with GPU</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">premium tier</span></div>
+        <div class="box" onclick="showDetail('collab')"><div class="box-title">Collaborate</div><div class="box-desc">Expert collaboration for field technicians (prev. Assist)</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">needs Watson Discovery</span></div>
+        <div class="box" onclick="showDetail('optimizer')"><div class="box-title">Optimizer</div><div class="box-desc">Work scheduling and resource assignment optimization</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">standalone</span></div>
+        <div class="box" onclick="showDetail('ref')"><div class="box-title">Real Estate & Facilities</div><div class="box-desc">TRIRIGA-based space and facilities management</div><span class="box-tag" style="background:#EEEDFE;color:#534AB7">separate admin</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#85B7EB">
+    <div class="layer-header" onclick="toggleLayer('l6')">
+      <span class="layer-badge" style="background:#E6F1FB;color:#185FA5">MAS core</span>
+      <span class="layer-title">Maximo Application Suite core + mandatory prerequisites</span>
+      <span class="layer-sub">SLS · DRO · cert-manager · MAS admin · user registry · app operator</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l6-arrow">▼</span>
+    </div>
+    <div id="l6-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('sls')"><div class="box-title">Suite License Service (SLS)</div><div class="box-desc">Holds your IBM license file. Controls AppPoints pool</div><span class="box-tag" style="background:#E6F1FB;color:#185FA5">mandatory all apps</span></div>
+        <div class="box" onclick="showDetail('dro')"><div class="box-title">Data Reporter Operator</div><div class="box-desc">Reports usage metrics to IBM hourly. Replaced UDS in 9.0</div><span class="box-tag" style="background:#E6F1FB;color:#185FA5">mandatory all apps</span></div>
+        <div class="box" onclick="showDetail('certmgr')"><div class="box-title">cert-manager</div><div class="box-desc">Automatically issues and renews TLS certs for all endpoints</div><span class="box-tag" style="background:#E6F1FB;color:#185FA5">mandatory all apps</span></div>
+        <div class="box" onclick="showDetail('mascore')"><div class="box-title">MAS core operator</div><div class="box-desc">Admin console UI, workspace config, user registry, app lifecycle</div><span class="box-tag" style="background:#E6F1FB;color:#185FA5">mandatory</span></div>
+        <div class="box" onclick="showDetail('mongodb')"><div class="box-title">MongoDB</div><div class="box-desc">MAS metadata, user config, security settings, preferences</div><span class="box-tag" style="background:#E6F1FB;color:#185FA5">mandatory</span></div>
+        <div class="box" onclick="showDetail('cp4d')"><div class="box-title">Cloud Pak for Data</div><div class="box-desc">Analytics platform — needed for Predict, Health advanced</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">some apps</span></div>
+        <div class="box" onclick="showDetail('db2')"><div class="box-title">Db2 Warehouse</div><div class="box-desc">Relational database for Manage, Monitor, Health transaction data</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">some apps</span></div>
+        <div class="box" onclick="showDetail('kafka')"><div class="box-title">Kafka (AMQ Streams)</div><div class="box-desc">Message bus for IoT devices and Monitor event streaming</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">Monitor/IoT</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#F0997B">
+    <div class="layer-header" onclick="toggleLayer('l5')">
+      <span class="layer-badge" style="background:#FAECE7;color:#993C1D">OCP services</span>
+      <span class="layer-title">Red Hat OpenShift cluster services</span>
+      <span class="layer-sub">Ingress router · Image registry · Monitoring · Logging · etcd · OperatorHub</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l5-arrow">▼</span>
+    </div>
+    <div id="l5-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('ingress')"><div class="box-title">Ingress router (HAProxy)</div><div class="box-desc">Routes browser requests to the correct pod by hostname/path</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">OCP built-in</span></div>
+        <div class="box" onclick="showDetail('registry')"><div class="box-title">Internal image registry</div><div class="box-desc">Stores container images. Must be manually enabled on bare metal</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">manual setup</span></div>
+        <div class="box" onclick="showDetail('etcd')"><div class="box-title">etcd</div><div class="box-desc">Distributed key-value DB holding all OCP/Kubernetes resource state</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">master nodes only</span></div>
+        <div class="box" onclick="showDetail('prom')"><div class="box-title">Prometheus / Grafana</div><div class="box-desc">OCP built-in monitoring stack. Collects cluster and app metrics</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">OCP built-in</span></div>
+        <div class="box" onclick="showDetail('opHub')"><div class="box-title">OperatorHub / OLM</div><div class="box-desc">Operator lifecycle manager — installs and upgrades all MAS components</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">OCP built-in</span></div>
+        <div class="box" onclick="showDetail('lvm-detail')"><div class="box-title">LVM Storage operator</div><div class="box-desc">Replaces ODF/Ceph on SNO — provisions PVCs from local NVMe disk via LVM thin pools</div><span class="box-tag" style="background:#FAECE7;color:#993C1D">SNO storage</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#97C459">
+    <div class="layer-header" onclick="toggleLayer('l4')">
+      <span class="layer-badge" style="background:#EAF3DE;color:#3B6D11">OCP platform</span>
+      <span class="layer-title">Red Hat OpenShift Container Platform (4.16–4.18)</span>
+      <span class="layer-sub">Control plane (master nodes) · Data plane (worker nodes) · RHCOS OS</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l4-arrow">▼</span>
+    </div>
+    <div id="l4-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('sno-node')"><div class="box-title">Single node (your machine)</div><div class="box-desc">Runs both control plane AND worker workloads — master + worker combined</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">SNO</span></div>
+        <div class="box" onclick="showDetail('sno-etcd')"><div class="box-title">etcd (single instance)</div><div class="box-desc">Kubernetes state DB runs on your machine. No quorum needed — but no HA either</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">SNO — no HA</span></div>
+        <div class="box" onclick="showDetail('rhcos')"><div class="box-title">RHCOS OS</div><div class="box-desc">Red Hat Enterprise Linux CoreOS — auto-managed OS installed by Assisted Installer</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">your machine OS</span></div>
+        <div class="box" onclick="showDetail('cri-o')"><div class="box-title">CRI-O container runtime</div><div class="box-desc">Runs all containers on your node. Manages image pulling and pod lifecycle</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">all nodes</span></div>
+        <div class="box" onclick="showDetail('kubenet')"><div class="box-title">OVN-Kubernetes networking</div><div class="box-desc">Software-defined network — all pods communicate via virtual network on your machine</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">all nodes</span></div>
+        <div class="box" onclick="showDetail('sno-taint')"><div class="box-title">Master taint removed</div><div class="box-desc">On SNO the master taint is automatically removed so MAS pods can schedule here</div><span class="box-tag" style="background:#EAF3DE;color:#3B6D11">SNO auto-config</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#FAC775">
+    <div class="layer-header" onclick="toggleLayer('l3')">
+      <span class="layer-badge" style="background:#FAEEDA;color:#854F0B">SNO</span>
+      <span class="layer-title">No hypervisor — OCP installs directly on bare metal</span>
+      <span class="layer-sub">Assisted Installer · Discovery ISO · RHCOS boots direct · no VMware needed</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l3-arrow">▼</span>
+    </div>
+    <div id="l3-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('assisted-installer')"><div class="box-title">Assisted Installer</div><div class="box-desc">Red Hat web tool that generates a discovery ISO — easiest SNO install path</div><span class="box-tag" style="background:#FAEEDA;color:#854F0B">recommended</span></div>
+        <div class="box" onclick="showDetail('discovery-iso')"><div class="box-title">Discovery ISO / USB boot</div><div class="box-desc">Boot from ISO — discovers hardware and installs RHCOS + OCP automatically</div><span class="box-tag" style="background:#FAEEDA;color:#854F0B">bare metal</span></div>
+        <div class="box" onclick="showDetail('metallb')"><div class="box-title">MetalLB (load balancer)</div><div class="box-desc">Software LB built into OCP — replaces external hardware LB needed in multi-node</div><span class="box-tag" style="background:#FAEEDA;color:#854F0B">SNO replaces hw LB</span></div>
+        <div class="box" onclick="showDetail('lvm-storage')"><div class="box-title">LVM Storage operator</div><div class="box-desc">Replaces ODF/Ceph for SNO — uses local disk LVM to provide PVCs. Simple, single-node</div><span class="box-tag" style="background:#FCEBEB;color:#791F1F">replaces ODF</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" style="border-left-color:#9FE1CB">
+    <div class="layer-header" onclick="toggleLayer('l2')">
+      <span class="layer-badge" style="background:#E1F5EE;color:#0F6E56">Your hardware</span>
+      <span class="layer-title">Your bare metal machine — Ryzen 9 9950X3D · 256 GB DDR5 · RTX 5070</span>
+      <span class="layer-sub">1 TB NVMe (needs upgrade) · x86_64 · UEFI boot</span>
+      <span style="font-size:12px;color:var(--color-text-tertiary)" id="l2-arrow">▼</span>
+    </div>
+    <div id="l2-body" class="layer-body closed">
+      <div class="boxes">
+        <div class="box" onclick="showDetail('your-cpu')">
+          <div class="box-title">Ryzen 9 9950X3D</div>
+          <div class="box-desc">16 cores / 32 threads, Zen 5, 5.7 GHz boost — meets SNO 16-core minimum</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#27500A">pass</span>
+        </div>
+        <div class="box" onclick="showDetail('your-ram')">
+          <div class="box-title">256 GB DDR5-6000</div>
+          <div class="box-desc">G.Skill Flare X5 AMD EXPO — 4× the 64 GB SNO minimum. Runs all MAS apps easily</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#27500A">pass — excellent</span>
+        </div>
+        <div class="box" onclick="showDetail('your-storage')">
+          <div class="box-title">1 TB NVMe (current)</div>
+          <div class="box-desc">Not enough — RHCOS + OCP + MAS PVCs (Db2, MongoDB, registry) need 2 TB+</div>
+          <span class="box-tag" style="background:#FCEBEB;color:#791F1F">upgrade required</span>
+        </div>
+        <div class="box" onclick="showDetail('your-gpu')">
+          <div class="box-title">RTX 5070 (Blackwell)</div>
+          <div class="box-desc">Unlocks Maximo Visual Inspection GPU acceleration via NVIDIA operator</div>
+          <span class="box-tag" style="background:#EAF3DE;color:#27500A">bonus — MVI ready</span>
+        </div>
+        <div class="box" onclick="showDetail('your-network')">
+          <div class="box-title">Network / NIC</div>
+          <div class="box-desc">Gigabit minimum needed. Stable IP or DHCP reservation required for cluster</div>
+          <span class="box-tag" style="background:#FAEEDA;color:#633806">verify</span>
+        </div>
+        <div class="box" onclick="showDetail('your-bastion')">
+          <div class="box-title">Bastion machine (separate)</div>
+          <div class="box-desc">Small Linux machine needed to run install commands — mini PC, old laptop, or Pi</div>
+          <span class="box-tag" style="background:#FAEEDA;color:#633806">need to add</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="overview-detail" class="detail"></div>
+</div>
+
+<div id="tab-infra" class="panel">
+  <div class="info-box">
+    Your deployment uses <strong>Single-Node OpenShift (SNO)</strong> — one physical machine runs everything. No VMware, no multiple nodes. OCP installs directly on bare metal via the Assisted Installer.
+  </div>
+  
+  <h3 style="font-size: 16px; margin-bottom: 12px;">Your Hardware vs SNO Requirements</h3>
+  <table class="atbl">
+    <thead><tr><th>Component</th><th>SNO minimum</th><th>Your spec</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CPU</strong></td><td>16 vCPU</td><td>Ryzen 9 9950X3D — 16 cores / 32 threads, 5.7 GHz</td><td style="color:var(--color-text-success);font-weight:600">Pass</td></tr>
+      <tr><td><strong>RAM</strong></td><td>64 GB</td><td>256 GB DDR5-6000 G.Skill Flare X5 (AMD EXPO)</td><td style="color:var(--color-text-success);font-weight:600">Pass — 4× min</td></tr>
+      <tr><td><strong>Storage</strong></td><td>300 GB system + PVC space</td><td>1 TB NVMe — real need is 2–4 TB after PVCs</td><td style="color:var(--color-text-danger);font-weight:600">Upgrade required</td></tr>
+      <tr><td><strong>GPU</strong></td><td>Not required</td><td>RTX 5070 (Blackwell, NVIDIA)</td><td style="color:var(--color-text-success);font-weight:600">Bonus — MVI ready</td></tr>
+      <tr><td><strong>Architecture</strong></td><td>x86_64</td><td>AMD Zen 5 — x86_64 compatible</td><td style="color:var(--color-text-success);font-weight:600">Pass</td></tr>
+      <tr><td><strong>Bastion host</strong></td><td>Separate Linux machine</td><td>Not in spec — must be added</td><td style="color:var(--color-text-warning);font-weight:600">Need to add</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Storage Breakdown — Why 1 TB is not enough</h3>
+  <table class="atbl">
+    <thead><tr><th>What uses disk</th><th>Approximate size</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>RHCOS OS + OCP control plane</td><td>~80 GB</td><td>System partition on your NVMe</td></tr>
+      <tr><td>Container image layers (MAS + prereqs)</td><td>~150–200 GB</td><td>Pulled from registries on install</td></tr>
+      <tr><td>Internal image registry PVC</td><td>100–500 GB</td><td>Must be manually enabled on bare metal</td></tr>
+      <tr><td>MongoDB PVC</td><td>50–100 GB</td><td>MAS metadata, user config</td></tr>
+      <tr><td>Db2 Warehouse PVC</td><td>200–500 GB</td><td>Manage asset and work order data</td></tr>
+      <tr><td>Kafka PVC</td><td>50–100 GB</td><td>IoT / Monitor message streams</td></tr>
+      <tr><td>Logs, Prometheus metrics, scratch</td><td>~50 GB</td><td>OCP observability stack</td></tr>
+      <tr><td style="font-weight:600">Realistic total</td><td style="font-weight:600;color:var(--color-text-danger)">~900 GB – 1.5 TB</td><td style="font-weight:600">Before any real asset data</td></tr>
+    </tbody>
+  </table>
+  
+  <div class="info-box" style="margin-top:20px; background:var(--color-background-warning); border-left-color:var(--color-text-warning); color:var(--color-text-warning);">
+    <strong>Recommendation:</strong> Add a second NVMe SSD — 2 TB minimum, 4 TB strongly preferred (e.g., Samsung 990 Pro 4TB, WD Black SN850X 4TB). On SNO, the LVM Storage operator pools all local disks together automatically. Your existing 1 TB stays for RHCOS/OCP, and the new disk becomes the LVM pool for PVCs.
+  </div>
+</div>
+
+<div id="tab-ocp" class="panel">
+  <div class="info-box">
+    OpenShift organizes everything into <strong>namespaces</strong> (called Projects in OCP). Each MAS component gets its own namespace. This isolation prevents components from interfering with each other.
+  </div>
+  
+  <h3 style="font-size: 16px; margin-bottom: 12px;">Key OCP Namespaces in a MAS Installation</h3>
+  <div class="ns-grid">
+    <div class="ns-box"><div class="ns-name">openshift-*</div><div class="ns-desc">OCP cluster services — router, monitoring, logging, image registry</div></div>
+    <div class="ns-box"><div class="ns-name">cert-manager</div><div class="ns-desc">cert-manager operator — handles all TLS certificate lifecycle</div></div>
+    <div class="ns-box"><div class="ns-name">ibm-sls</div><div class="ns-desc">Suite License Service — holds IBM license file and AppPoints pool</div></div>
+    <div class="ns-box"><div class="ns-name">ibm-data-reporter</div><div class="ns-desc">Data Reporter Operator — reports usage metrics to IBM hourly</div></div>
+    <div class="ns-box"><div class="ns-name">mas-&lt;instance&gt;-core</div><div class="ns-desc">MAS core operator, admin console, user registry, workspace config</div></div>
+    <div class="ns-box"><div class="ns-name">mas-&lt;instance&gt;-manage</div><div class="ns-desc">Maximo Manage — EAM application pods and services</div></div>
+    <div class="ns-box"><div class="ns-name">mas-&lt;instance&gt;-monitor</div><div class="ns-desc">Maximo Monitor — IoT monitoring pods and Kafka consumers</div></div>
+    <div class="ns-box"><div class="ns-name">ibm-cpd-operator</div><div class="ns-desc">Cloud Pak for Data control plane — Db2, Watson Studio, Watson ML</div></div>
+    <div class="ns-box"><div class="ns-name">mongoce</div><div class="ns-desc">MongoDB Community Edition — MAS metadata and user config store</div></div>
+    <div class="ns-box"><div class="ns-name">openshift-storage</div><div class="ns-desc">LVM Storage operator on SNO — provisions PVCs from local NVMe via LVM thin pools (replaces ODF/Ceph)</div></div>
+    <div class="ns-box"><div class="ns-name">openshift-image-registry</div><div class="ns-desc">Internal image registry — must be manually enabled on bare metal SNO (not auto-enabled)</div></div>
+    <div class="ns-box"><div class="ns-name">amq-streams</div><div class="ns-desc">Red Hat AMQ Streams (Kafka) — IoT and Monitor message streaming</div></div>
+  </div>
+  
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Network Isolation</h3>
+  <div class="info-box" style="background:var(--color-background-tertiary); border-left-color:var(--color-text-secondary);">
+    MAS uses <strong>NetworkPolicy</strong> resources to enforce a default deny-all policy in each namespace. Only traffic that MAS explicitly allows can flow between namespaces. You cannot customize these policies — they are managed by the MAS operator. To see them: <code>oc -n mas-&lt;instance&gt;-core get networkpolicies</code>
+  </div>
+</div>
+
+<div id="tab-prereqs" class="panel">
+  <div class="info-box">
+    Which prerequisites each MAS application needs. <strong>X</strong> = required, <strong>O</strong> = optional, <strong>—</strong> = not used.
+  </div>
+  
+  <div style="overflow-x:auto;">
+    <table class="atbl">
+      <thead>
+        <tr>
+          <th>Prerequisite</th>
+          <th>MAS Core</th>
+          <th>IoT</th>
+          <th>Monitor</th>
+          <th>Manage</th>
+          <th>Health</th>
+          <th>Predict</th>
+          <th>Collaborate</th>
+          <th>Visual Insp.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>cert-manager</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td></tr>
+        <tr><td>Suite License Service (SLS)</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td></tr>
+        <tr><td>Data Reporter Op (DRO)</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td></tr>
+        <tr><td>MongoDB</td><td class="tick">X</td><td class="tick">X</td><td class="tick">X</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td></tr>
+        <tr><td>CP4D control plane</td><td class="dash">—</td><td class="tick">X</td><td class="tick">X</td><td>O</td><td>O</td><td class="tick">X</td><td class="tick">X</td><td>O</td></tr>
+        <tr><td>Db2 Warehouse</td><td class="dash">—</td><td class="tick">X</td><td class="tick">X</td><td>O</td><td>O</td><td>O</td><td>O</td><td class="dash">—</td></tr>
+        <tr><td>Kafka (AMQ Streams)</td><td class="dash">—</td><td class="tick">X</td><td class="tick">X</td><td>O</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td></tr>
+        <tr><td>Watson Studio</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="tick">X</td><td class="dash">—</td><td class="dash">—</td></tr>
+        <tr><td>Watson Machine Learning</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="tick">X</td><td class="dash">—</td><td class="dash">—</td></tr>
+        <tr><td>Watson Discovery</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="tick">X</td><td class="dash">—</td></tr>
+        <tr><td>App Connect</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td>O</td><td class="dash">—</td><td>O</td></tr>
+        <tr><td>Relational DB (Manage)</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="tick">X</td><td class="tick">X</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td></tr>
+        <tr><td>SMTP server</td><td>O</td><td class="dash">—</td><td class="dash">—</td><td>O</td><td class="dash">—</td><td class="dash">—</td><td>O</td><td class="dash">—</td></tr>
+        <tr><td>LDAP server</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="info-box" style="margin-top:20px; background:var(--color-background-danger); border-left-color:var(--color-text-danger); color:var(--color-text-danger);">
+    <strong>Important:</strong> IBM App Connect and Cloud Pak for Data do NOT support odd-numbered OCP versions. If you plan to use Predict, Health+Predict-Utilities, or Collaborate, you must use OCP 4.16 or 4.18 (not 4.17).
+  </div>
+</div>
+
+<div id="tab-mas" class="panel">
+  <div class="info-box">
+    MAS core is the management shell. It installs first and then activates applications. The admin console URL is <code>https://admin.&lt;your-mas-domain&gt;</code>
+  </div>
+  
+  <h3 style="font-size: 16px; margin-bottom: 12px;">Install Sequence (What the MAS CLI does in order)</h3>
+  <div style="overflow-x:auto; padding-bottom:12px;">
+    <div class="flow" style="min-width:700px; flex-wrap:nowrap;">
+      <div class="fbox" style="background:#E6F1FB;border-color:#B5D4F4;color:#185FA5">1. cert-manager</div><div class="farr">→</div>
+      <div class="fbox" style="background:#EEEDFE;border-color:#AFA9EC;color:#534AB7">2. SLS</div><div class="farr">→</div>
+      <div class="fbox" style="background:#EEEDFE;border-color:#AFA9EC;color:#534AB7">3. DRO</div><div class="farr">→</div>
+      <div class="fbox" style="background:#E6F1FB;border-color:#B5D4F4;color:#185FA5">4. MongoDB</div><div class="farr">→</div>
+      <div class="fbox" style="background:#E6F1FB;border-color:#B5D4F4;color:#185FA5">5. MAS core</div><div class="farr">→</div>
+      <div class="fbox" style="background:#FAEEDA;border-color:#FAC775;color:#854F0B">6. Prerequisites (Db2, Kafka…)</div><div class="farr">→</div>
+      <div class="fbox" style="background:#EAF3DE;border-color:#C0DD97;color:#3B6D11">7. Activate apps</div>
+    </div>
+  </div>
+  
+  <h3 style="font-size: 16px; margin: 20px 0 10px;">Install Command</h3>
+  <div style="font-family:var(--font-mono); font-size:13px; background:var(--color-text-primary); border-radius:var(--border-radius-md); padding:16px; color:#f8fafc; line-height:1.6; overflow-x:auto;">
+    docker run -ti --pull always quay.io/ibmmas/cli mas install
+  </div>
+  
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">What Happens During Activation</h3>
+  <table class="atbl">
+    <thead><tr><th>App</th><th>Namespace created</th><th>What gets deployed</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Manage</strong></td><td><code>mas-&lt;inst&gt;-manage</code></td><td>Manage application pods, Manage Kafka listener, Manage DB schema in Db2</td></tr>
+      <tr><td><strong>Monitor</strong></td><td><code>mas-&lt;inst&gt;-monitor</code></td><td>Monitor service pods, Kafka topic subscriptions, Db2 analytics tables</td></tr>
+      <tr><td><strong>Health</strong></td><td><code>mas-&lt;inst&gt;-health</code></td><td>Health pods + CP4D service dependency wiring</td></tr>
+      <tr><td><strong>Predict</strong></td><td><code>mas-&lt;inst&gt;-predict</code></td><td>Predict pods + Watson Studio + Watson ML integration</td></tr>
+      <tr><td><strong>Visual Insp.</strong></td><td><code>mas-&lt;inst&gt;-visualinspection</code></td><td>MVI pods + GPU node labeling if available</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="tab-users" class="panel">
+  <div class="info-box">
+    Starting in MAS 9.1, all user management is centralized in suite security. Users are created once and synchronized to each application automatically.
+  </div>
+
+  <h3 style="font-size: 16px; margin-bottom: 12px;">Authentication Flow</h3>
+  <div style="overflow-x:auto; padding-bottom:12px;">
+    <div class="flow" style="min-width:650px; flex-wrap:nowrap;">
+      <div class="fbox">Browser</div><div class="farr">→</div>
+      <div class="fbox">Load balancer</div><div class="farr">→</div>
+      <div class="fbox">OCP Ingress router</div><div class="farr">→</div>
+      <div class="fbox" style="background:#E6F1FB;border-color:#B5D4F4;color:#185FA5">MAS auth service</div><div class="farr">→</div>
+      <div class="fbox" style="background:#FAEEDA;border-color:#FAC775;color:#854F0B">IdP (LDAP/SAML/Local)</div><div class="farr">→</div>
+      <div class="fbox" style="background:#EAF3DE;border-color:#C0DD97;color:#3B6D11">App granted (OIDC token)</div>
+    </div>
+  </div>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Authentication Methods</h3>
+  <table class="atbl">
+    <thead><tr><th>Method</th><th>How it works</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Local</strong></td><td>Username/password stored in MongoDB. MAS manages everything</td><td>Small deployments, testing</td></tr>
+      <tr><td><strong>LDAP</strong></td><td>Auth delegated to LDAP/AD server. MAS syncs users periodically</td><td>Enterprise AD integration</td></tr>
+      <tr><td><strong>SAML</strong></td><td>SSO via SAML IdP. Users from other apps automatically signed into MAS</td><td>Enterprise SSO</td></tr>
+      <tr><td><strong>OIDC</strong></td><td>OAuth2/OIDC flow. Mainly for Collaborate and API access</td><td>API clients, modern IdP</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Access Types & License Cost (AppPoints)</h3>
+  <table class="atbl">
+    <thead><tr><th>Access type</th><th>AppPoints behavior</th><th>Who should use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Concurrent</strong></td><td>AppPoints checked out on login, returned on logout</td><td>Most users — shared pool</td></tr>
+      <tr><td><strong>Authorized</strong></td><td>AppPoints permanently reserved for this user</td><td>Admins — guaranteed access always</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Entitlement Tiers</h3>
+  <table class="atbl">
+    <thead><tr><th>Entitlement tier</th><th>Apps included</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Self-service</strong></td><td>Minimal Manage access only (e.g. submit service requests)</td></tr>
+      <tr><td><strong>Limited</strong></td><td>Maximo Manage + Maximo Monitor</td></tr>
+      <tr><td><strong>Base</strong></td><td>Limited + Maximo Collaborate + Maximo Health</td></tr>
+      <tr><td><strong>Premium</strong></td><td>Base + Maximo Predict + Maximo Visual Inspection + Manage industry add-ons</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Administrative Roles</h3>
+  <table class="atbl">
+    <thead><tr><th>Admin role</th><th>What they can do</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Suite administrator</strong></td><td>Full admin: deploy apps, configure DB, manage catalog, all settings</td></tr>
+      <tr><td><strong>System configuration</strong></td><td>Edit catalog, configurations, license consumption — but not app deployment</td></tr>
+      <tr><td><strong>IDP management</strong></td><td>Configure LDAP, SAML, OIDC, SMTP, certs, user sync — subset of system config</td></tr>
+      <tr><td><strong>API key management</strong></td><td>Create/manage API keys (must have same access level as the key)</td></tr>
+      <tr><td><strong>User management</strong></td><td>Create and manage other users — assigned via USERMANAGEMENT security group</td></tr>
+      <tr><td><strong>Application admin</strong></td><td>Manage users and settings within a specific app (e.g. MONITOR_ADMIN group)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box" style="margin-top:20px; background:var(--color-background-tertiary); border-left-color:var(--color-text-secondary);">
+    <strong>Security groups:</strong> Users are added to security groups. Groups define which apps and what permissions. A user's entitlement tier is automatically set to the highest tier required by all their combined security groups. Default groups exist for each app (e.g. MONITOR_ADMIN, MONITOR_USERS, MVI_ADMIN, MVI_USERS, ASSISTADMIN, ASSISTTECHUSERS).
+  </div>
+</div>
+
+<div id="tab-network" class="panel">
+  <div class="info-box" style="background:var(--color-background-warning); border-left-color:var(--color-text-warning); color:var(--color-text-warning);">
+    DNS is the most common cause of failed MAS installations. Every application URL is a subdomain of your MAS domain. All must resolve to the OCP ingress load balancer.
+  </div>
+  
+  <h3 style="font-size: 16px; margin-bottom: 12px;">Required DNS Records (all pointing to OCP ingress LB)</h3>
+  <table class="atbl">
+    <thead><tr><th>DNS record</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>admin.&lt;mas-domain&gt;</code></td><td>MAS administration console</td></tr>
+      <tr><td><code>api.&lt;mas-domain&gt;</code></td><td>MAS API endpoint</td></tr>
+      <tr><td><code>auth.&lt;mas-domain&gt;</code></td><td>MAS authentication service</td></tr>
+      <tr><td><code>home.&lt;mas-domain&gt;</code> (and *.home.*)</td><td>MAS home application</td></tr>
+      <tr><td><code>manage.&lt;mas-domain&gt;</code> (and *.manage.*)</td><td>Maximo Manage application</td></tr>
+      <tr><td><code>monitor.&lt;mas-domain&gt;</code> (and *.monitor.*)</td><td>Maximo Monitor application</td></tr>
+      <tr><td><code>health.&lt;mas-domain&gt;</code> (and *.health.*)</td><td>Maximo Health</td></tr>
+      <tr><td><code>predict.&lt;mas-domain&gt;</code> (and *.predict.*)</td><td>Maximo Predict</td></tr>
+      <tr><td><code>iot.&lt;mas-domain&gt;</code> (and *.iot.*)</td><td>IoT tool + messaging</td></tr>
+      <tr><td><code>assist.&lt;mas-domain&gt;</code> (and *.assist.*)</td><td>Maximo Collaborate</td></tr>
+      <tr><td><code>visualinspection.&lt;mas-domain&gt;</code> (and *.vi.*)</td><td>Visual Inspection</td></tr>
+      <tr><td><code>*.optimizer.&lt;mas-domain&gt;</code></td><td>Maximo Optimizer</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Container Registries (Outbound port 443 required)</h3>
+  <div class="ns-grid">
+    <div class="ns-box"><div class="ns-name">cp.icr.io / icr.io</div><div class="ns-desc">IBM registry — MAS, SLS images (requires entitlement key)</div></div>
+    <div class="ns-box"><div class="ns-name">quay.io</div><div class="ns-desc">Red Hat registry — OCP, MAS dependency images</div></div>
+    <div class="ns-box"><div class="ns-name">registry.redhat.io</div><div class="ns-desc">Red Hat operator catalog entries</div></div>
+    <div class="ns-box"><div class="ns-name">docker.io</div><div class="ns-desc">Docker Hub — some MAS dependency images</div></div>
+    <div class="ns-box"><div class="ns-name">gcr.io</div><div class="ns-desc">Google Container Registry — some dependencies</div></div>
+    <div class="ns-box"><div class="ns-name">ghcr.io</div><div class="ns-desc">GitHub Container Registry — MAS tooling images</div></div>
+    <div class="ns-box"><div class="ns-name">nvcr.io</div><div class="ns-desc">NVIDIA registry — GPU-related MAS components</div></div>
+    <div class="ns-box"><div class="ns-name" style="color:var(--color-text-warning);">iaps.ibm.cloud (198.41.0.4)</div><div class="ns-desc">DRO usage reporting endpoint — must also be allowed</div></div>
+  </div>
+
+  <h3 style="font-size: 16px; margin: 24px 0 12px;">Load Balancing on SNO — MetalLB Replaces External Hardware LB</h3>
+  <table class="atbl">
+    <thead><tr><th>Purpose</th><th>Port</th><th>How on SNO</th></tr></thead>
+    <tbody>
+      <tr><td><strong>OCP API server</strong></td><td>6443 (TCP)</td><td>SNO node IP directly — no LB needed, single node has fixed IP</td></tr>
+      <tr><td><strong>OCP app traffic (MAS)</strong></td><td>443 (HTTPS) + 80 (HTTP)</td><td>MetalLB operator assigns a VIP from your local subnet</td></tr>
+    </tbody>
+  </table>
+  
+  <div class="info-box" style="margin-top:20px; background:var(--color-background-tertiary); border-left-color:var(--color-text-secondary);">
+    <strong>DNS on SNO:</strong> Point all ~20 MAS DNS records to your machine's static IP (or MetalLB VIP for app traffic). Use <code>dnsmasq</code> on your bastion or router for local DNS — add <code>address=/.mas.local/&lt;your-machine-ip&gt;</code> to catch all subdomains in one line.
+  </div>
+</div>
+
+<div id="global-detail" class="detail"></div>
+</div>
+
+<script>
+const details = {
+  'load-balancers': {title:'Load balancers', items:['Two LBs needed: one for OCP API (port 6443 → master nodes), one for app traffic (443/80 → ingress router)', 'Without these, browsers cannot reach MAS and oc CLI cannot reach the cluster', 'Can be hardware LB, F5, HAProxy, or any TCP layer-4 LB', 'Must remain stable — changing LB IPs breaks DNS and breaks the cluster']},
+  'dns': {title:'DNS server', items:['~20 DNS records needed before MAS install — all pointing to app LB IP', 'Wildcard records needed: *.manage.*, *.monitor.*, *.home.*, etc.', 'DNS must resolve both inside the OCP cluster (internal) AND from user browsers', 'Without DNS, MAS CLI install fails early — check this first if install hangs']},
+  'ldap': {title:'LDAP / Active Directory', items:['Optional but strongly recommended for enterprise use', 'MAS syncs users from LDAP on a configured schedule', 'Requires LDAPS (secure LDAP, port 636) — plain LDAP (389) not supported for sync', 'Configure in MAS admin console → Configurations → LDAP User Registry Sync', 'Can also use LDAP just for authentication without full user sync']},
+  'saml': {title:'SAML identity provider', items:['Allows SSO with other enterprise apps — user logs in once, accesses everything', 'MAS acts as SAML service provider (SP); your corporate IdP is the identity provider', 'Supports IdP-initiated login (from corporate portal into MAS) and SP-initiated (from MAS login page)', 'Seamless login option: users bypass MAS login page entirely and go straight to SAML IdP', 'Configure in MAS admin console → Configurations → Identity Providers']},
+  'smtp': {title:'SMTP server', items:['MAS sends notification emails through this server', 'Required for password reset, alerts, and some application notifications', 'Configure in MAS admin console under Configurations', 'Common corporate SMTP servers (Exchange, Postfix) work fine']},
+  'bastion': {title:'Bastion host (for SNO)', items:['A second small Linux machine to run install commands — your SNO machine cannot be used during install', 'Minimum: 2 cores, 4 GB RAM, 20 GB disk. Options: old laptop, mini PC (Beelink/Minisforum), Raspberry Pi 4 (8 GB)', 'Install on bastion: oc CLI, podman or docker, dig, curl, ssh', 'Must be on the same network as your SNO machine and have internet access', 'Also configure dnsmasq here for local MAS DNS resolution', 'After install, bastion is used for all ongoing oc CLI administration']},
+  'manage': {title:'Maximo Manage', items:['The core EAM/CMMS application — assets, work orders, inventory, procurement, labor', 'Most organizations deploying MAS are deploying it primarily for Manage', 'Requires: Db2 (exclusive instance recommended for production), MongoDB, Kafka (optional)', 'Activation takes 1–3 hours (pulls many images, runs DB schema creation)', 'Each workspace gets a separate Manage URL: https://<workspace>.manage.<domain>', 'Supports Db2, Oracle, and SQL Server databases', 'Industry solutions and add-ons are included with Premium entitlement']},
+  'monitor': {title:'Maximo Monitor', items:['Real-time IoT device monitoring — collects sensor data, creates dashboards', 'Requires: Kafka (for streaming device data), Db2 (for metric storage and analytics), CP4D', 'Devices send data via MQTT or Kafka topics through the IoT tool', 'Create device types, metrics, and alert rules through the Monitor UI', 'Monitor connects to the same Db2 instance as IoT (typically)']},
+  'health': {title:'Maximo Health', items:['Asset health scoring and condition assessment based on sensor and work order data', 'Uses AI models to calculate health scores from multiple data inputs', 'Requires: CP4D control plane', 'Works alongside Maximo Manage — assets managed in Manage get health scores in Health', 'Health add-on for Manage includes health data directly in Manage UI']},
+  'predict': {title:'Maximo Predict', items:['Machine learning-based failure prediction for assets', 'Requires: CP4D, Watson Studio, Watson Machine Learning', 'Models trained on historical work order and sensor data', 'Outputs: estimated days to failure, recommended action', 'Must use even-numbered OCP version (CP4D restriction)']},
+  'mvi': {title:'Maximo Visual Inspection', items:['Computer vision for visual inspection of assets and products', 'GPU nodes strongly recommended for model training and inference', 'Does NOT use Db2 — stores images and model data in object storage and PVCs', 'Deploy models to edge cameras for real-time defect detection', 'Premium entitlement required']},
+  'collab': {title:'Maximo Collaborate (formerly Assist)', items:['Expert collaboration platform for field technicians', 'Technicians in the field get remote expert help via video/AR overlays', 'Requires: Watson Discovery (for knowledge search), App Connect (optional)', 'Must use even-numbered OCP version', 'ICE (VoIP) server needed for real-time voice communication']},
+  'optimizer': {title:'Maximo Optimizer', items:['Work scheduling optimization — assigns work orders to technicians based on skills, location, availability', 'Runs optimization models to minimize travel time and maximize utilization', 'Integrates with Manage for work order data']},
+  'ref': {title:'Maximo Real Estate and Facilities', items:['TRIRIGA-based space and facilities management', 'Separate admin model — uses own user system alongside MAS', 'First login MUST use FACILITIESADMIN user ID', 'Supports Db2, Oracle, and SQL Server', 'Separate compatibility matrix from rest of MAS']},
+  'sls': {title:'Suite License Service (SLS)', items:['Holds your IBM license file (downloaded from Passport Advantage)', 'Controls your total AppPoints pool — all apps draw from this', 'All MAS applications check in with SLS for license compliance', 'Installed once per OCP cluster (can serve multiple MAS instances)', 'Namespace: ibm-sls']},
+  'dro': {title:'Data Reporter Operator (DRO)', items:['Replaced User Data Services (UDS) in MAS 9.0', 'Collects usage metrics and uploads to IBM hourly (internet required)', 'For air-gapped environments: manual export/import mechanism available', 'Connects outbound to iaps.ibm.cloud (198.41.0.4) — must be in firewall allow-list', 'Namespace: ibm-data-reporter']},
+  'certmgr': {title:'cert-manager', items:['Automatically issues and renews TLS certificates for all MAS endpoints', 'Installed in cert-manager namespace, operand runs in cert-manager namespace', 'ClusterIssuer resource defines the CA (Let\'s Encrypt for internet, or internal CA)', 'Check cert status: oc get certificate -A', 'Without cert-manager, all HTTPS endpoints break — install this first']},
+  'mascore': {title:'MAS core operator', items:['The management shell of MAS — everything else installs through it', 'Provides: admin console UI, workspace management, application lifecycle, user registry', 'Installed in mas-<instance>-core namespace', 'Admin console: https://admin.<mas-domain>', 'Uses Kubernetes operators (CRDs) to manage each application — operators watch for CRs and reconcile']},
+  'mongodb': {title:'MongoDB', items:['MAS uses MongoDB Community Edition for metadata storage', 'Stores: user records, security settings, workspace config, application configuration', 'Runs as a 3-node replica set (primary + 2 secondaries) for high availability', 'If primary fails, one secondary is automatically elected new primary', 'Namespace: mongoce', 'Back up MongoDB regularly — loss of MongoDB means loss of all MAS configuration']},
+  'cp4d': {title:'Cloud Pak for Data (CP4D)', items:['IBM\'s analytics platform — required for Predict, Health (advanced), Collaborate', 'Has its own control plane, UI (separate from MAS admin), and admin user set', 'After installing CP4D, install services inside it: Db2 Warehouse, Watson Studio, Watson ML, Watson Discovery', 'Do NOT use odd-numbered OCP versions with CP4D (4.15, 4.17 are unsupported)', 'Namespace: ibm-cpd-operator (control plane)']},
+  'db2': {title:'Db2 Warehouse', items:['IBM Db2 installed via Db2U operator — runs as containers inside OCP', 'Used by: Manage (asset/work order data), Monitor (metric time-series), IoT (device data)', 'Manage should have its own exclusive Db2 instance in production', 'Monitor/IoT/Predict typically share a Db2 instance', 'Needs large PVCs: 100–500 GB+ depending on data volume', 'Also supports external Oracle or SQL Server for Manage and Real Estate & Facilities']},
+  'kafka': {title:'Kafka (AMQ Streams)', items:['Apache Kafka deployed via Red Hat AMQ Streams operator', 'Used for: IoT device message streaming, Monitor event processing', 'Manage can optionally use Kafka for integration messaging', 'Kafka data is not typically backed up — relies on replication for HA', 'Namespace: amq-streams']},
+  'ingress': {title:'OCP Ingress router (HAProxy)', items:['Routes incoming HTTPS requests to the correct pod based on hostname', 'Every MAS application URL (manage.*, monitor.*, etc.) is a separate Route resource in OCP', 'HAProxy terminates TLS (using certs from cert-manager) or passes through', 'Runs on infrastructure nodes (recommended) or worker nodes', 'Check router pods: oc get pods -n openshift-ingress']},
+  'registry': {title:'Internal image registry (SNO setup)', items:['On SNO (bare metal), the image registry is NOT auto-enabled — must be done manually', 'SNO uses LVM storage (RWO only) — set rolloutStrategy=Recreate in the imageregistry config', 'Steps: install LVM Storage operator → create LVMCluster → then edit imageregistry config', 'oc edit configs.imageregistry.operator.openshift.io: set managementState=Managed, rolloutStrategy=Recreate, storage.pvc.claim=\'\'', 'OCP will auto-create the PVC using the lvms-vg1 storage class', 'Check: oc get co image-registry (must show Available=True before installing MAS)']},
+  'etcd': {title:'etcd on SNO', items:['Single etcd instance — runs on your machine alongside everything else', 'Holds ALL Kubernetes resource definitions: deployments, secrets, configmaps, CRDs', 'No 3-node quorum on SNO — if machine dies, etcd is unavailable until it recovers (then auto-resumes)', 'Back up etcd regularly from your bastion: oc exec -n openshift-etcd etcd-<nodename> -- etcdctl snapshot save /tmp/snap.db', 'Copy backup off machine: oc cp openshift-etcd/etcd-<nodename>:/tmp/snap.db ./etcd-backup.db', 'Schedule a cron job on your bastion to automate this daily']},
+  'prom': {title:'Prometheus / Grafana', items:['Built into OCP — collects metrics from all cluster nodes and pods', 'Access: OCP console → Observe → Dashboards', 'MAS adds its own dashboards and alert rules', 'For persistent metrics (survive pod restarts), configure persistent storage for Prometheus', 'Alert rules can send to PagerDuty, Slack, email via Alertmanager']},
+  'opHub': {title:'OperatorHub / OLM', items:['Operator Lifecycle Manager manages installation and upgrades of all operators', 'MAS components are delivered as Kubernetes operators from IBM catalog', 'OLM watches operator subscriptions and automatically applies updates when available', 'Check subscriptions: oc get subscription -A', 'Upgrade path: update the subscription channel to pull a newer version']},
+  'odf': {title:'LVM Storage operator (replaces ODF on SNO)', items:['ODF/Ceph requires 3 dedicated storage nodes — not possible on SNO', 'LVM Storage operator is the correct storage solution for SNO', 'Install from OperatorHub, create LVMCluster CR pointing to your raw NVMe disk', 'Creates lvms-vg1 storage class — MAS uses this for Db2, MongoDB, Kafka PVCs', 'Image registry: use RWO PVC with rolloutStrategy=Recreate (SNO cannot use ReadWriteMany)', 'ODF dashboard not available on SNO — use oc get pvc -A to monitor storage usage']},
+  'masters': {title:'Master node (your machine on SNO)', items:['On SNO, your single machine IS the master node', 'Runs: Kubernetes API server, etcd, scheduler, controller manager — all on your 9950X3D', 'RHCOS is installed automatically by the Assisted Installer', 'Master taint removed automatically on SNO so MAS pods can also run here', 'If machine reboots, OCP recovers automatically — no manual intervention needed']},
+  'workers': {title:'Worker node (same machine on SNO)', items:['On SNO, the master node also acts as the worker node — same physical machine', 'All MAS pods (Manage, Monitor, Db2, MongoDB, Kafka, SLS, DRO) run here', 'Your 16 cores and 256 GB RAM are shared between OCP control plane and MAS workloads', 'OCP overhead: ~2 cores + ~12 GB RAM reserved for control plane, leaving ~14 cores + 244 GB for MAS', 'MAS SNO tested and documented for up to 70 concurrent Manage users']},
+  'infranodes': {title:'Infrastructure nodes — not applicable on SNO', items:['Infrastructure nodes do not exist in SNO — there is only one node', 'On SNO, the OCP router (HAProxy), monitoring (Prometheus), and logging all run on your machine', 'This is expected and normal for SNO', 'Your 256 GB RAM easily absorbs these additional OCP services']},
+  'rhcos': {title:'RHCOS (Red Hat Enterprise Linux CoreOS)', items:['OS on all OCP nodes — optimized for running containers, managed by OCP', 'You do NOT install or maintain RHCOS manually — OCP machine config operator handles updates', 'Immutable root filesystem — prevents accidental OS modification', 'Ignition files configure RHCOS on first boot during OCP installation']},
+  'assisted-installer': {title:'Red Hat Assisted Installer', items:['Web-based tool at console.redhat.com/openshift/assisted-installer', 'You define your cluster (name, domain, SNO), download a discovery ISO', 'Boot your machine from the ISO (USB or virtual media via IPMI/iDRAC/BMC)', 'The ISO discovers your hardware, reports back to the web UI, then you trigger install', 'RHCOS is installed automatically — you do not touch the OS', 'Install takes 45–90 minutes. Monitor progress in the web UI or via SSH to the node']},
+  'discovery-iso': {title:'Discovery ISO / USB boot', items:['Download the ISO from the Assisted Installer after configuring your SNO cluster definition', 'Write to USB: dd if=discovery.iso of=/dev/sdX bs=4M status=progress', 'Or use Balena Etcher on Windows if you prefer a GUI', 'Boot your machine from USB — set boot priority in BIOS/UEFI', 'Machine must have UEFI boot enabled (not legacy BIOS)', 'Static IP recommended: configure during Assisted Installer setup to avoid DHCP changes breaking the cluster']},
+  'metallb': {title:'MetalLB load balancer', items:['Software load balancer built for bare-metal Kubernetes — replaces hardware LB', 'Install from OperatorHub: search MetalLB, install with defaults', 'Configure an IPAddressPool with an IP from your local subnet (e.g. 192.168.1.200)', 'Configure an L2Advertisement resource to announce the VIP via ARP', 'All MAS application DNS records point to this VIP', 'OCP API (port 6443) uses your machine\'s real IP directly — no LB needed for API on SNO']},
+  'lvm-storage': {title:'LVM Storage operator (SNO storage)', items:['Replaces ODF/Ceph on SNO — Ceph needs 3 nodes minimum, LVM works on a single disk', 'Install from OperatorHub: search LVM Storage, install with defaults', 'Create an LVMCluster CR — it auto-discovers your available raw block devices', 'Creates storage class: lvms-vg1 (ReadWriteOnce) — MAS uses this for all PVCs', 'For ReadWriteMany PVCs (image registry): configure rolloutStrategy=Recreate in the imageregistry config', 'Tip: dedicate your second NVMe (2–4 TB) as the LVM disk — keep RHCOS/OCP on the first 1 TB disk']},
+  'lvm-detail': {title:'LVM Storage operator (SNO storage)', items:['Replaces ODF/Ceph on SNO — Ceph needs 3 nodes minimum, LVM works on a single disk', 'Install from OperatorHub: search LVM Storage, install with defaults', 'Create an LVMCluster CR — it auto-discovers your available raw block devices', 'Creates storage class: lvms-vg1 — MAS uses this for all PVCs', 'For the image registry on SNO: set rolloutStrategy=Recreate in imageregistry config (PVC must be RWO)', 'Dedicate your second NVMe as the LVM disk — keep RHCOS/OCP on the first 1 TB disk']},
+  'your-cpu': {title:'Ryzen 9 9950X3D — CPU analysis', items:['16 physical cores / 32 threads — meets the SNO minimum of 16 vCPU exactly', 'Zen 5 architecture — x86_64, fully compatible with RHCOS and all OCP/MAS components', '3D V-Cache gives excellent memory bandwidth for Java-heavy MAS workloads', 'Boost to 5.7 GHz — fast single-thread performance benefits database queries in Db2 and MongoDB', 'All 16 cores are available to OCP — SNO removes the master taint so pods can schedule here', 'MAS workloads are mostly I/O and memory-bound — CPU will not be your bottleneck']},
+  'your-ram': {title:'256 GB DDR5-6000 — RAM analysis', items:['4× the 64 GB SNO minimum — exceptional headroom', 'DDR5-6000 with AMD EXPO: high bandwidth benefits Db2 query performance and MongoDB operations', 'Enough to run simultaneously: MAS core (~8 GB) + Manage (~16 GB) + Db2 (~32 GB) + MongoDB (~8 GB) + Kafka (~8 GB) + Monitor (~8 GB) + OCP overhead (~12 GB) = ~92 GB, leaving 164 GB free', 'Even with CP4D for Predict/Health, you have plenty of headroom (~40–60 GB additional)', 'MAS document: SNO tested at 64 GB — your 256 GB gives you 4× that headroom', 'Supports up to 70 concurrent users on SNO per MAS documentation']},
+  'your-storage': {title:'1 TB NVMe — storage gap analysis', items:['SNO minimum: 300 GB primary storage. But that covers only RHCOS + OCP install layers', 'Real usage after all PVCs: 900 GB – 1.5 TB before any asset data goes in', 'Your 1 TB will be exhausted during or shortly after MAS activation — causing pod eviction', 'Minimum to add: 1 × 2 TB NVMe (total: 3 TB). Recommended: 1 × 4 TB NVMe (total: 5 TB)', 'Keep existing 1 TB for RHCOS/OCP system disk. New disk becomes the LVM pool for all PVCs', 'Good options: Samsung 990 Pro 4TB, WD Black SN850X 4TB, Seagate FireCuda 530 4TB']},
+  'your-gpu': {title:'RTX 5070 — GPU analysis', items:['Not required for MAS core, Manage, Monitor, Health, Predict, or Collaborate', 'Unlocks Maximo Visual Inspection (MVI) GPU acceleration — model training and inference', 'To use for MVI: install NVIDIA GPU Operator from OperatorHub, label the node with nvidia.com/gpu=present', 'MVI images pulled from nvcr.io — ensure this registry is in your firewall allow-list', 'RTX 5070 is Blackwell architecture — NVIDIA GPU Operator supports it', 'GPU sits completely idle when not running MVI — zero impact on other MAS apps']},
+  'your-network': {title:'Network / NIC requirements', items:['Gigabit Ethernet (1 GbE) is the absolute minimum — 2.5 GbE or 10 GbE strongly preferred', 'Your machine needs a stable IP address — either static or DHCP reservation in your router', 'DNS: all ~20 MAS subdomain records must point to this IP (or MetalLB VIP)', 'The machine must be able to reach the internet on port 443 to pull container images', 'Check NIC compatibility: most modern NICs work with RHCOS. Use lspci on Linux to identify your NIC model', 'SNO does not need multiple NICs or VLANs — single NIC is fine for a lab/dev deployment']},
+  'your-bastion': {title:'Bastion machine — what you need', items:['A second Linux machine to run install commands — needed because you cannot run oc CLI inside the SNO node during install', 'Minimum: 2 cores, 4 GB RAM, 20 GB disk — even a Raspberry Pi 4 (8 GB) works', 'Options: old laptop with Ubuntu, cheap mini PC (Beelink, Minisforum), spare desktop', 'Must have network access to your SNO machine\'s IP', 'Install on bastion: oc CLI, podman or docker, dig, curl, ssh client', 'Alternatively: if you have a second PC already, just install RHEL or Ubuntu and use it as bastion']},
+  'sno-node': {title:'Single-node OCP — your machine', items:['Your Ryzen 9950X3D machine runs both the OCP control plane AND all MAS workloads', 'OCP automatically removes the master taint on SNO — pods can schedule on the master node', 'No VM overhead — OCP runs directly on RHCOS on your bare metal, giving full access to all 16 cores and 256 GB RAM', 'Single node means no high availability — if machine reboots, MAS is down until it comes back up', 'SNO is officially supported by MAS for up to 70 concurrent users with Manage', 'Reboot recovery is automatic — OCP and MAS pods restart themselves after node reboot']},
+  'sno-etcd': {title:'etcd on SNO', items:['etcd runs as a single instance on your machine — no 3-node quorum required', 'Single-instance etcd: if the machine dies, cluster state is lost until the machine recovers', 'Back up etcd regularly: oc exec -n openshift-etcd etcd-<node> -- etcdctl snapshot save /tmp/snapshot.db', 'Then copy snapshot off the machine: oc cp openshift-etcd/etcd-<node>:/tmp/snapshot.db ./etcd-backup.db', 'etcd data is stored on the RHCOS root disk — another reason your 1 TB disk needs to be dedicated to RHCOS only']},
+  'sno-taint': {title:'Master taint removal on SNO', items:['In a multi-node OCP cluster, master nodes have a taint that prevents application pods from scheduling there', 'On SNO, OCP automatically removes this taint — otherwise no pods could run anywhere', 'This is handled by the SNO installer — you do not need to do anything manually', 'Result: all OCP system pods and all MAS application pods share the same node (your machine)', 'This is expected and correct for SNO — all 16 cores and 256 GB RAM are fully shared']},
+  'servers': {title:'Your machine (bare metal SNO)', items:['Single x86_64 machine — Ryzen 9 9950X3D, 256 GB RAM', 'No VMware or hypervisor needed — OCP installs directly via RHCOS', 'Meets and exceeds SNO minimum specs (16 CPU, 64 GB RAM)', 'Storage upgrade needed: add 2–4 TB NVMe before installing MAS']},
+  'storage-hw': {title:'Storage — upgrade required', items:['Current: 1 TB NVMe — not enough for a full MAS deployment', 'Add: 2 TB NVMe minimum, 4 TB strongly recommended', 'LVM Storage operator will pool the second disk for all MAS PVCs', 'Keep existing 1 TB as the RHCOS/OCP system disk', 'NVMe strongly preferred (PCIe 4.0 or 5.0) for Db2 I/O performance']},
+  'network-hw': {title:'Network for SNO', items:['Single NIC is sufficient for SNO lab deployment', 'Needs stable IP (static or DHCP reservation)', '1 GbE minimum; 2.5 GbE or 10 GbE preferred', 'All MAS DNS records point to this machine\'s IP', 'dnsmasq on bastion is the easiest DNS solution for a lab']},
+  'firewall': {title:'Firewall / router rules', items:['Allow outbound port 443 from your machine to: cp.icr.io, quay.io, registry.redhat.io, docker.io, gcr.io, ghcr.io, nvcr.io, registry.connect.redhat.com', 'Allow outbound to iaps.ibm.cloud (198.41.0.4) for DRO usage reporting', 'Allow inbound 443 and 80 to your machine IP or MetalLB VIP for browser access to MAS', 'Most home/office routers allow all outbound by default — you mainly need to check if your org has an outbound proxy']},
+  'cri-o': {title:'CRI-O container runtime', items:['Container runtime on all OCP nodes — replaces Docker in OCP 4.x', 'Pulls images from registries, runs containers in pods', 'ImagePullBackOff errors → check CRI-O logs: oc describe pod <pod>', 'Managed by OCP — you do not interact with CRI-O directly normally']},
+  'kubenet': {title:'OVN-Kubernetes networking', items:['Software-defined network for pod-to-pod and pod-to-service communication inside the cluster', 'Automatically creates routes between pods across different nodes', 'NetworkPolicy resources (used by MAS) are enforced here', 'MAS uses default deny-all NetworkPolicy in each namespace']},
+};
+
+let openLayers = {};
+
+function toggleLayer(id) {
+  const header = document.querySelector(`#${id}-body`).previousElementSibling;
+  const body = document.getElementById(`${id}-body`);
+  const arrow = document.getElementById(`${id}-arrow`);
+  const open = body.classList.contains('closed');
+  
+  body.classList.toggle('closed', !open);
+  header.classList.toggle('open', open);
+  if(arrow) arrow.textContent = open ? '▲' : '▼';
+  openLayers[id] = open;
+}
+
+function showDetail(key) {
+  const d = details[key];
+  if(!d) return;
+  const el = document.getElementById('overview-detail') || document.getElementById('global-detail');
+  
+  if(el) {
+    el.innerHTML = `
+      <button class="detail-close" onclick="closeDetail(this)" aria-label="Close detail panel">&times;</button>
+      <h4>${d.title}</h4>
+      <ul>${d.items.map(i => `<li>${i}</li>`).join('')}</ul>
+      <div style="margin-top:16px;">
+        <button class="btn-ai" onclick="sendPrompt('Tell me more about ${d.title} in IBM MAS on SNO bare metal')">
+          Ask Gemini ✦
+        </button>
+      </div>
+    `;
+    
+    // Ensure the container of the detail panel is visible
+    el.parentElement.appendChild(el); 
+    el.classList.add('open');
+    
+    // Scroll element into view smoothly if it's off-screen
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function closeDetail(btn) {
+  const detailEl = btn.closest('.detail');
+  if(detailEl) detailEl.classList.remove('open');
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  
+  const panel = document.getElementById('tab-' + t);
+  if (panel) panel.classList.add('active');
+  
+  // Match by exact tab or string includes
+  if (event && event.currentTarget && event.currentTarget.classList) {
+    event.currentTarget.classList.add('active');
+  } else {
+    document.querySelectorAll('.tab').forEach(b => {
+      if(b.textContent.trim().toLowerCase().replace(/\s+/g,'-').includes(t.toLowerCase().slice(0,4))) {
+        b.classList.add('active');
+      }
+    });
+  }
+  
+  // Close the global detail panel when switching tabs
+  const el = document.getElementById('global-detail');
+  if(el) el.classList.remove('open');
+  const elOverview = document.getElementById('overview-detail');
+  if(elOverview) elOverview.classList.remove('open');
+}
+
+// Mock function for the AI button
+function sendPrompt(promptText) {
+  alert("Simulated prompt sent to Gemini: \n\n" + promptText);
+}
+</script>
+
+</body>
+</html>

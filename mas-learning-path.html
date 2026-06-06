@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAS On-Premises Learning Path</title>
+<style>
+  :root {
+    /* Color Palette */
+    --color-background-base: #f3f6f8;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f8fafc;
+    --color-background-info: #eff6ff;
+    --color-background-success: #f0fdf4;
+    --color-background-warning: #fffbeb;
+    
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
+    --color-text-info: #1d4ed8;
+    --color-text-success: #15803d;
+    --color-text-warning: #b45309;
+    
+    --color-border-primary: #e2e8f0;
+    --color-border-secondary: #cbd5e1;
+    --color-border-tertiary: #f1f5f9;
+    
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --transition-speed: 0.25s;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--color-background-base);
+    color: var(--color-text-primary);
+    line-height: 1.5;
+    padding: 2rem 1rem;
+    margin: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--color-background-primary);
+    padding: 2.5rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    margin-bottom: 2.5rem;
+  }
+  
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--color-border-primary);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Phases & Topics */
+  .phase { margin-bottom: 2.5rem; }
+  
+  .phase-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin-bottom: 1.2rem; 
+  }
+  
+  .phase-badge { 
+    font-size: 12px; 
+    font-weight: 600; 
+    padding: 4px 12px; 
+    border-radius: 20px; 
+    white-space: nowrap; 
+  }
+  
+  .phase-title { 
+    font-size: 18px; 
+    font-weight: 600; 
+    color: var(--color-text-primary); 
+  }
+  
+  .phase-sub { 
+    font-size: 13px; 
+    font-weight: 500;
+    color: var(--color-text-tertiary); 
+    margin-left: auto; 
+  }
+
+  .topics { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    gap: 12px; 
+  }
+
+  .topic-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topic { 
+    background: var(--color-background-primary); 
+    border: 1px solid var(--color-border-primary); 
+    border-radius: var(--border-radius-md); 
+    padding: 14px 16px; 
+    cursor: pointer; 
+    transition: all var(--transition-speed);
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+
+  .topic:hover { 
+    border-color: var(--color-border-secondary); 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+  }
+
+  .topic.done {
+    background: var(--color-background-secondary);
+    opacity: 0.8;
+  }
+
+  .topic-title { 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: var(--color-text-primary); 
+    margin-bottom: 4px; 
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .topic-desc { 
+    font-size: 13px; 
+    color: var(--color-text-secondary); 
+    line-height: 1.5; 
+  }
+
+  .topic-tag { 
+    font-size: 11px; 
+    font-weight: 500;
+    margin-top: 10px; 
+    display: inline-block; 
+    padding: 3px 10px; 
+    border-radius: 20px; 
+  }
+
+  /* Accordion Detail Panel */
+  .detail-panel { 
+    background: var(--color-background-secondary); 
+    border: 1px solid var(--color-border-primary);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md); 
+    font-size: 13px; 
+    color: var(--color-text-secondary); 
+    line-height: 1.6; 
+    
+    /* Animation defaults */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 16px;
+    margin-top: -8px; /* tuck behind the main card */
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease;
+  }
+
+  .detail-panel.open { 
+    max-height: 500px; 
+    opacity: 1;
+    padding: 20px 16px 16px; 
+    margin-bottom: 8px;
+  }
+
+  .detail-panel ul { margin: 8px 0 0; padding-left: 20px; }
+  .detail-panel li { margin-bottom: 6px; }
+
+  /* Buttons */
+  button {
+    font-family: inherit;
+    font-weight: 500;
+    background: var(--color-background-primary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  button:hover {
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-text-secondary);
+  }
+
+  .btn-primary {
+    background: var(--color-text-primary);
+    color: white;
+    border: 1px solid var(--color-text-primary);
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .btn-primary:hover {
+    background: #334155;
+    color: white;
+  }
+
+  .divider { 
+    border: none; 
+    border-top: 1px solid var(--color-border-primary); 
+    margin: 2.5rem 0; 
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="sr-only" style="position:absolute;left:-9999px">MAS on-premises learning path for beginners</h2>
+
+  <div class="header-actions">
+    <div>
+      <div class="header-title">Your MAS on-premises learning path</div>
+      <div class="header-subtitle">Based on IBM MAS 9.1 documentation · Click any topic to expand</div>
+    </div>
+    
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-header">
+      <span>Overall Progress</span>
+      <span id="prog-text">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="prog" style="width:0%; background: var(--color-text-info);"></div>
+    </div>
+  </div>
+
+  <div id="phases"></div>
+</div>
+
+<script>
+// Mock sendPrompt function in case it's missing from your host environment
+window.sendPrompt = window.sendPrompt || function(promptText) {
+  alert("Prompt ready to send to AI:\n\n" + promptText);
+};
+
+const phases = [
+  {
+    id: 1,
+    label: "Phase 1 — Foundation",
+   
+    color: "var(--color-text-info)",
+    bgColor: "var(--color-background-info)",
+    textColor: "var(--color-text-info)",
+    topics: [
+      { title: "Linux & command line", desc: "You'll run most MAS commands from a terminal. Learn bash basics, file navigation, editing files.", tag: "prerequisite", detail: ["Basic bash commands: ls, cd, mkdir, cp, mv, rm", "Editing files with vi or nano", "Managing users and permissions (chmod, chown)", "Networking commands: ping, curl, dig, nslookup", "SSH into remote servers"] },
+      { title: "Containers & Docker", desc: "MAS runs in containers. Understand what a container is, how images work, and basic Docker commands.", tag: "prerequisite", detail: ["What containers are vs virtual machines", "docker pull, run, exec, logs, ps commands", "Understanding images and registries (docker.io, quay.io)", "Container networking basics", "Why IBM uses cp.icr.io and quay.io registries"] },
+      { title: "Kubernetes basics", desc: "MAS sits on top of Kubernetes. Learn pods, nodes, namespaces, deployments, and kubectl.", tag: "prerequisite", detail: ["Pods, nodes, clusters", "kubectl get / describe / logs / apply", "Namespaces and contexts", "Deployments, services, persistent volumes", "YAML manifests"] },
+      { title: "Red Hat OpenShift (OCP)", desc: "MAS requires OpenShift — Red Hat's enterprise Kubernetes. Learn how it differs and how to use the oc CLI.", tag: "critical", detail: ["oc CLI vs kubectl", "OpenShift projects (namespaces)", "Routes and ingress", "Operators and OperatorHub", "OpenShift console (web UI)", "OCP versions 4.16–4.18 are supported for MAS 9.1"] },
+      { title: "What MAS actually is", desc: "Read the technical overview in the doc. Understand the architecture: core, apps, Cloud Pak for Data, Db2.", tag: "read doc", detail: ["MAS core = the management layer", "Applications: Manage, Monitor, Health, Predict, etc.", "Cloud Pak for Data = required for some apps", "Db2 Warehouse = database backend", "SLS (Suite License Service) = licensing component", "DRO (Data Reporter Operator) = usage reporting"] },
+    ]
+  },
+  {
+    id: 2,
+    label: "Phase 2 — Pre-install Planning",
+    
+    color: "var(--color-text-success)",
+    bgColor: "var(--color-background-success)",
+    textColor: "var(--color-text-success)",
+    topics: [
+      { title: "Hardware sizing", desc: "The doc has a sizing table. Decide: small/medium/large/XL workload → CPU cores, RAM, and disk per worker node.", tag: "read doc", detail: ["Small: 4 CPU, 16GB RAM, 100GB disk per worker", "Medium: 8 CPU, 32GB RAM, 200GB", "Large: 16 CPU, 64GB RAM, 400GB", "Minimum 300GB storage per worker for MAS build process", "4GB RAM per CPU is the general ratio", "Use IBM's sizing calculator (linked in doc)"] },
+      { title: "Cluster topology", desc: "Plan master nodes (min 3 for HA) + worker nodes + infra nodes. Understand what runs where.", tag: "architecture", detail: ["At least 3 master nodes for high availability", "Worker nodes run MAS applications", "Infrastructure nodes for OCP services (logging, monitoring)", "Bastion host: needed to run install commands", "Storage nodes if using OCP Data Foundation (Ceph)"] },
+      { title: "Networking & DNS", desc: "MAS needs many DNS records. Plan your domain, set up wildcard DNS entries, open firewall ports.", tag: "critical", detail: ["Plan a domain like mas.yourcompany.com", "Required DNS records: admin.*, api.*, auth.*, home.*, manage.*, monitor.*", "Firewalls must allow port 443 to: cp.icr.io, quay.io, registry.redhat.io, gcr.io, docker.io", "Load balancers needed for OCP API and app traffic", "Internal DNS must resolve the MAS domain inside the cluster"] },
+      { title: "Storage planning", desc: "MAS needs persistent storage shared across nodes. OCP Data Foundation (Ceph) is the common choice on-prem.", tag: "critical", detail: ["OCP Data Foundation (formerly Red Hat OCS) = Ceph-based storage", "Storage classes needed: cephfs (ReadWriteMany) and ceph-rbd (ReadWriteOnce)", "Enable internal image registry manually for bare metal/vSphere (step in the doc)", "Minimum 500GB PVC for image registry", "Each Db2 instance needs 100–500GB+"] },
+      { title: "Software entitlements", desc: "Get your IBM entitlement key from IBM Passport Advantage. Link MAS to Red Hat account for OCP licenses.", tag: "admin", detail: ["IBM Passport Advantage: get entitlement key", "Log in to cp.icr.io with your key to verify access", "Link IBM order to Red Hat account (Passport Advantage → Link with Red Hat OpenShift)", "OCP entitlement is included with MAS license", "Red Hat OpenShift versions 4.16–4.18 supported"] },
+    ]
+  },
+  {
+    id: 3,
+    label: "Phase 3 — Install OpenShift",
+    
+    color: "var(--color-text-warning)",
+    bgColor: "var(--color-background-warning)",
+    textColor: "var(--color-text-warning)",
+    topics: [
+      { title: "VMware or bare metal setup", desc: "On-prem means you provision VMs yourself (VMware vSphere is common). Set up nodes with RHCOS.", tag: "infra", detail: ["Red Hat Enterprise Linux CoreOS (RHCOS) on all nodes", "3 master VMs + 3+ worker VMs minimum", "Static IPs or DHCP reservation for all nodes", "Network boot or ISO install for RHCOS", "OCP installer-provisioned (IPI) or user-provisioned (UPI) install"] },
+      { title: "Install OCP with IPI or UPI", desc: "Run the OpenShift installer. IPI automates more; UPI gives you more control for on-prem.", tag: "hands-on", detail: ["Download openshift-install binary from Red Hat", "Create install-config.yaml with cluster details", "IPI on vSphere can fully automate VM provisioning", "UPI requires manual VM creation then bootstrap", "openshift-install create cluster command", "Installation takes 30–60 minutes"] },
+      { title: "Enable image registry", desc: "On bare metal/vSphere, the internal image registry is not auto-enabled. The doc has the exact steps.", tag: "read doc", detail: ["Create PVC for image-registry-storage (500GB, cephfs)", "oc edit configs.imageregistry.operator.openshift.io", "Change managementState from Removed to Managed", "Set storage.pvc.claim to your PVC name", "Enable external route: oc patch configs.imageregistry..."] },
+      { title: "Verify cluster health", desc: "Before installing MAS, confirm all OCP operators are healthy and nodes are Ready.", tag: "checklist", detail: ["oc get nodes — all must show Ready", "oc get co — all cluster operators must be Available", "oc get pods -A — no pods in Error/CrashLoopBackOff", "Test storage: create a test PVC and verify it binds", "Check DNS resolves cluster URLs from inside and outside"] },
+    ]
+  },
+  {
+    id: 4,
+    label: "Phase 4 — Install MAS",
+    color: "#6366f1", // Custom indigo for Phase 4
+    bgColor: "#e0e7ff",
+    textColor: "#4338ca",
+    topics: [
+      { title: "MAS CLI installer", desc: "The main install method. Pull the CLI container image, run mas install, answer prompts.", tag: "hands-on", detail: ["docker run -ti --pull always quay.io/ibmmas/cli mas install", "Provide: entitlement key, domain, instance name, workspace ID", "CLI installs: SLS, DRO (usage reporting), cert-manager, MAS core", "Instance name: 3–12 chars, lowercase, letters/numbers/hyphens", "Workspace ID: 3–12 chars, lowercase letters/numbers only"] },
+      { title: "Ansible collection", desc: "For automation and repeatable installs. The Ansible roles wrap each install step.", tag: "advanced", detail: ["ibm.mas_devops Ansible collection", "Each role installs one component: cp4d, db2, kafka, mas_core, etc.", "Good for CI/CD pipelines and scripted installs", "Playbook examples in the doc", "Requires ansible-playbook and OCP credentials"] },
+      { title: "Install prerequisites", desc: "Some MAS apps need Db2, Kafka, MongoDB, or Cloud Pak for Data. Install these before activating apps.", tag: "critical", detail: ["IBM Db2 via Db2U operator (required for Manage, Monitor)", "Kafka via AMQ Streams operator (required for Monitor, IoT)", "MongoDB (required for Manage)", "Cloud Pak for Data (required for Predict, Health advanced features)", "cert-manager operator (installed automatically by MAS CLI)"] },
+      { title: "Deploy & activate apps", desc: "From the MAS admin console, activate the apps you licensed: Manage, Monitor, Health, etc.", tag: "hands-on", detail: ["Log into MAS admin console: admin.<your-domain>", "Go to Applications → Activate", "Maximo Manage is the most common app (EAM/CMMS)", "Each app pulls images from cp.icr.io on activation", "Activation can take 1–3 hours per app", "Watch pod status: oc get pods -n mas-<instance>-manage"] },
+    ]
+  },
+  {
+    id: 5,
+    label: "Phase 5 — Configure & Administer",
+    time: "Ongoing",
+    color: "var(--color-text-success)",
+    bgColor: "var(--color-background-success)",
+    textColor: "var(--color-text-success)",
+    topics: [
+      { title: "User management & LDAP", desc: "Connect MAS to your corporate directory (Active Directory/LDAP) for user authentication and sync.", tag: "admin", detail: ["Configure LDAP registry sync in MAS admin console", "Map AD groups to MAS security groups", "SCIM 2.0 also supported for user sync", "SAML SSO for single sign-on with enterprise apps", "User roles: application user, app admin, suite admin"] },
+      { title: "Certificates", desc: "MAS uses cert-manager. Set up TLS certificates — either Let's Encrypt (internet) or internal CA (air-gapped).", tag: "admin", detail: ["cert-manager operator manages all TLS certs", "ClusterIssuer resource defines the CA", "Let's Encrypt works if cluster can reach internet", "For internal CA: configure ca-issuer with your cert chain", "oc get certificate -A to check cert status"] },
+      { title: "Monitoring the cluster", desc: "Use OCP's built-in Prometheus/Grafana and MAS dashboards to track health.", tag: "operations", detail: ["OCP console → Monitoring → Dashboards", "OpenTelemetry operator for advanced metrics", "oc get pods -A | grep -v Running to spot issues", "MAS admin console shows application health", "Set up alert rules in Prometheus for node/storage issues"] },
+      { title: "Upgrades", desc: "MAS uses channel subscriptions for updates. Understand how to upgrade MAS core and individual apps.", tag: "operations", detail: ["Two upgrade methods: channel subscription (automatic) or static catalog (manual)", "Upgrade OCP first, then MAS core, then apps", "oc get subscription -A to see current channels", "MAS 9.0 → 9.1 upgrade path documented in the doc", "Test upgrades in non-prod first", "Rolling back apps is possible if needed"] },
+      { title: "Backup & recovery", desc: "Plan backups for Db2 databases, MongoDB, and OCP etcd. No backup = data loss risk.", tag: "critical", detail: ["Backup OCP etcd (master node state) regularly", "Db2 backups: use Db2U backup CRD or external tools", "MongoDB backup for Manage data", "Persistent volume snapshots via storage provider", "Test restoration procedure — don't assume it works"] },
+    ]
+  }
+];
+
+let expanded = {};
+let completed = new Set();
+
+function render() {
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+  
+  phases.forEach((phase, phaseIndex) => {
+    const div = document.createElement('div');
+    div.className = 'phase';
+    
+    const topicsHtml = phase.topics.map((t, ti) => {
+      const key = `${phase.id}-${ti}`;
+      const isOpen = expanded[key];
+      const isDone = completed.has(key);
+      
+      return `
+      <div class="topic-wrapper">
+        <div class="topic${isDone ? ' done' : ''}" onclick="toggle('${key}')" style="border-left: 4px solid ${isDone ? phase.color : 'var(--color-border-secondary)'};">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <div style="flex:1">
+              <div class="topic-title">
+                ${t.title}
+                ${isDone ? `<span style="color:${phase.color}; font-size:14px;">✔</span>` : ''}
+              </div>
+              <div class="topic-desc">${t.desc}</div>
+              <span class="topic-tag" style="background:${phase.bgColor};color:${phase.textColor}">${t.tag}</span>
+            </div>
+            <div style="font-size:12px; color:var(--color-text-tertiary); margin-top:2px; transition: transform 0.3s; transform: rotate(${isOpen ? '180deg' : '0deg'})">▼</div>
+          </div>
+        </div>
+        <div class="detail-panel${isOpen ? ' open' : ''}">
+          <strong style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-text-tertiary);">Key learning points</strong>
+          <ul>${t.detail.map(d => `<li>${d}</li>`).join('')}</ul>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button onclick="event.stopPropagation(); markDone('${key}')" style="font-size:12px; padding:6px 12px; ${isDone ? 'background:var(--color-background-secondary); border-color:transparent;' : ''}">
+              ${isDone ? 'Undo completion' : '✔ Mark as done'}
+            </button>
+            
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="phase-header">
+        <span class="phase-badge" style="background:${phase.bgColor};color:${phase.textColor}">Phase ${phase.id}</span>
+        <span class="phase-title">${phase.label.replace(/Phase \d+ — /, '')}</span>
+      </div>
+      <div class="topics">${topicsHtml}</div>
+      ${phaseIndex < phases.length - 1 ? '<hr class="divider">' : ''}
+    `;
+    container.appendChild(div);
+  });
+  
+  updateProgress();
+}
+
+function toggle(key) {
+  expanded[key] = !expanded[key];
+  render();
+}
+
+function markDone(key) {
+  if (completed.has(key)) {
+    completed.delete(key);
+  } else {
+    completed.add(key);
+    // Optionally close the panel when marked done
+    expanded[key] = false; 
+  }
+  render();
+}
+
+function updateProgress() {
+  const total = phases.reduce((sum, p) => sum + p.topics.length, 0);
+  const pct = Math.round((completed.size / total) * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = pct + '%';
+}
+
+// Initial Render
+render();
+</script>
+</body>
+</html>

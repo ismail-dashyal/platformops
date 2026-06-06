@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHOCP / SNO INSTALLATION GUIDE</title>
+<style>
+    :root {
+        --bg-color: #f1f5f9;
+        --surface: #ffffff;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --border: #e2e8f0;
+        --radius: 8px;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.7;
+        color: var(--text-main);
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 2rem 1rem;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: var(--surface);
+        padding: 3rem 4rem;
+        border-radius: var(--radius);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    }
+
+    h1, h2, h3, h4 {
+        color: #0f172a;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    h1 {
+        font-size: 2.25rem;
+        border-bottom: 4px solid var(--primary);
+        padding-bottom: 0.5rem;
+        display: inline-block;
+        margin-top: 0;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+    }
+
+    h3 {
+        font-size: 1.35rem;
+        color: var(--primary-dark);
+    }
+
+    p {
+        margin-bottom: 1.25rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    th, td {
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: #0f172a;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    tr:hover td {
+        background-color: #f1f5f9;
+    }
+
+    pre {
+        background-color: #1e293b;
+        color: #f8fafc;
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        overflow-x: auto;
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    code {
+        font-family: 'Fira Code', Consolas, Monaco, "Courier New", monospace;
+        font-size: 0.9rem;
+    }
+
+    p code, li code {
+        background-color: #f1f5f9;
+        color: #be123c;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.85em;
+        border: 1px solid var(--border);
+    }
+
+    .alert {
+        background-color: #fef2f2;
+        border-left: 5px solid #ef4444;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        color: #991b1b;
+    }
+
+    .tip {
+        background-color: #f0fdf4;
+        border-left: 5px solid #22c55e;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        color: #166534;
+    }
+
+    .note {
+        background-color: #eff6ff;
+        border-left: 5px solid #3b82f6;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        color: #1e40af;
+    }
+
+    ul {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+
+    li {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Table of Contents Styling */
+    .toc-container {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem 2rem;
+        margin: 2rem 0;
+    }
+
+    .toc-container ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .toc-container li {
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+    }
+
+    .toc-container li::before {
+        content: '→';
+        color: var(--primary);
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>RHOCP / SNO INSTALLATION GUIDE</h1>
+    <h2>IBM MAS Pre-Installation Phase 1</h2>
+    <h3>Dell OptiPlex 5080 — Bare Metal — Single Node OpenShift</h3>
+
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Your System</th>
+                <th>Spec</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Machine</td>
+                <td>Dell OptiPlex 5080</td>
+            </tr>
+            <tr>
+                <td>CPU</td>
+                <td>Intel Core i7-10700T @ 2.00 GHz (8 cores / 16 threads)</td>
+            </tr>
+            <tr>
+                <td>RAM</td>
+                <td>32.0 GB DDR4 @ 2666 MHz</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>477 GB SSD (NVMe 512 GB EVM SSD)</td>
+            </tr>
+            <tr>
+                <td>OS (current)</td>
+                <td>Windows 10 Pro 22H2 — will be WIPED</td>
+            </tr>
+            <tr>
+                <td>Target</td>
+                <td>Red Hat CoreOS (RHCOS) via SNO Assisted Installer</td>
+            </tr>
+            <tr>
+                <td>OCP Version</td>
+                <td>4.16.x or 4.17.x (latest stable)</td>
+            </tr>
+            <tr>
+                <td>Network Mode</td>
+                <td>Local LAN with internal DNS (dnsmasq)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="alert">
+        <strong>🚨 CRITICAL:</strong> This process will completely erase all data on the OptiPlex 5080. Back up everything important BEFORE you start.
+    </div>
+
+    <h2>Table of Contents</h2>
+    <div class="toc-container">
+        <ul>
+            <li>Phase 0 — System & Network Design Decisions</li>
+            <li>Phase 1 — Accounts, Keys & Software Prerequisites</li>
+            <li>Phase 2 — Bastion Host Setup (Ubuntu Linux)</li>
+            <li>Phase 3 — DNS Setup with dnsmasq</li>
+            <li>Phase 4 — Network & Static IP Configuration</li>
+            <li>Phase 5 — Generating the Discovery ISO (Assisted Installer)</li>
+            <li>Phase 6 — Booting the OptiPlex & SNO Installation</li>
+            <li>Phase 7 — Post-Install OCP Verification</li>
+            <li>Phase 8 — LVM Storage Operator Setup</li>
+            <li>Phase 9 — Image Registry Configuration</li>
+            <li>Phase 10 — OCP Cluster Health Checklist</li>
+            <li>Appendix A — Troubleshooting</li>
+            <li>Appendix B — Quick Reference Commands</li>
+        </ul>
+    </div>
+
+    <h2>Phase 0 — System & Network Design Decisions</h2>
+    <p>Before touching any keyboard, you need to decide on a few things. These values will be used everywhere — in DNS records, in the Assisted Installer, and in every oc command you run. Get them right now and write them down.</p>
+
+    <h3>0.1 Decide Your Cluster Name and Domain</h3>
+    <p>These two values are PERMANENT — you cannot change them after installation.</p>
+
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>What It Is</th>
+                <th>Example Value</th>
+                <th>Your Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cluster Name</td>
+                <td>Short name for your OCP cluster</td>
+                <td>sno</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>Base Domain</td>
+                <td>Your internal domain</td>
+                <td>mas.local</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>Full Cluster Domain</td>
+                <td>Combined (cluster.domain)</td>
+                <td>sno.mas.local</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>API URL</td>
+                <td>auto-generated</td>
+                <td>api.sno.mas.local</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>Apps Wildcard</td>
+                <td>auto-generated</td>
+                <td>*.apps.sno.mas.local</td>
+                <td>____________</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> For a completely internal lab with no public domain, use a .local or .lab suffix (e.g., mas.local). This is fine for a trial — you just need your DNS server and any client PCs to resolve it.
+    </div>
+
+    <h3>0.2 Decide Your IP Addressing</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Device</th>
+                <th>Role</th>
+                <th>IP Address</th>
+                <th>Your Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Bastion machine</td>
+                <td>Installer, DNS server, admin workstation</td>
+                <td>e.g., 192.168.1.10</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>OptiPlex 5080 (SNO node)</td>
+                <td>Your OCP single node</td>
+                <td>e.g., 192.168.1.50</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>Home Router / Gateway</td>
+                <td>Default gateway for all machines</td>
+                <td>e.g., 192.168.1.1</td>
+                <td>____________</td>
+            </tr>
+            <tr>
+                <td>Subnet</td>
+                <td>Your LAN subnet</td>
+                <td>192.168.1.0/24</td>
+                <td>____________</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> The OptiPlex 5080 MUST have a static IP. Configure this as a DHCP reservation in your home router using the machine's MAC address. This ensures it always gets the same IP, before and after the OCP install.
+    </div>
+
+    <h3>0.3 What You Need: Two Machines</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Machine</th>
+                <th>Role</th>
+                <th>Requirements</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Bastion (helper)</td>
+                <td>Runs DNS, Docker, MAS CLI, oc CLI, Assisted Installer interaction</td>
+                <td>Any PC/laptop with Ubuntu 20.04+ or 22.04, internet access, Docker</td>
+                <td>Can be your main Windows PC running WSL2 Ubuntu, or a spare laptop</td>
+            </tr>
+            <tr>
+                <td>OptiPlex 5080 (SNO)</td>
+                <td>The actual OCP node — gets wiped and runs RHCOS</td>
+                <td>32 GB RAM, 8 cores, 477 GB SSD, internet access during install</td>
+                <td>Will be completely reformatted</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> If you don't have a spare Linux machine, you can run Ubuntu 22.04 inside WSL2 on your main Windows PC for the bastion role. Docker Desktop with WSL2 backend works fine.
+    </div>
+
+    <h2>Phase 1 — Accounts, Keys & Software Prerequisites</h2>
+    <p>This is the GATE phase. Every single item here must be completed before you do anything else. Missing any one of these will block you mid-installation.</p>
+
+    <h3>1.1 Red Hat Account</h3>
+    <ul>
+        <li>Go to https://console.redhat.com</li>
+        <li>Sign in or create a free Red Hat account (use a corporate or personal email).</li>
+        <li>If you only have a developer/trial account: go to https://developers.redhat.com — sign up for the free Red Hat Developer Program.</li>
+        <li>This gives you access to OCP pull secrets and the Assisted Installer for non-production use.</li>
+        <li>After login, go to: OpenShift → Downloads → Pull Secret</li>
+        <li>Click Copy pull secret (or Download) — save this as pull-secret.json in a safe folder.</li>
+    </ul>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> The Pull Secret is a JSON blob that looks like: <code>{"auths":{"cloud.openshift.com":{...}, "quay.io":{...}, ...}}</code>. It contains credentials for Red Hat's container registries. Keep it secret — treat it like a password file.
+    </div>
+
+    <h3>1.2 Generate SSH Key Pair (on Bastion)</h3>
+    <p>Run this on your bastion machine (Ubuntu terminal or WSL2):</p>
+    <pre><code>ssh-keygen -t ed25519 -C "sno-admin" -f ~/.ssh/sno_key
+# When prompted for passphrase: press Enter twice (no passphrase for lab use)
+
+# Verify the keys were created:
+ls -la ~/.ssh/sno_key*
+# You should see:  sno_key  (private)  and  sno_key.pub  (public)
+
+# Display the public key — you will paste this into the Assisted Installer:
+cat ~/.ssh/sno_key.pub</code></pre>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> Copy the FULL contents of sno_key.pub — it starts with <code>ssh-ed25519 AAAA...</code> and ends with <code>sno-admin</code>. You will paste this exact string into the Assisted Installer.
+    </div>
+
+    <h3>1.3 Software to Install on Bastion</h3>
+    <p>Install Docker Engine (Ubuntu 22.04)</p>
+    <pre><code># Update packages and install prerequisites
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add Docker repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Add your user to docker group (no sudo needed after this)
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify Docker works
+docker run hello-world</code></pre>
+
+    <p>Install oc and kubectl CLI Tools</p>
+    <pre><code># Download OpenShift client (pick the latest stable 4.16 or 4.17 matching your target version)
+OCP_VERSION=4.16.0
+curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+
+# Extract and install
+tar -xvzf openshift-client-linux.tar.gz
+sudo mv oc kubectl /usr/local/bin/
+sudo chmod +x /usr/local/bin/oc /usr/local/bin/kubectl
+
+# Verify
+oc version
+kubectl version --client</code></pre>
+
+    <p>Install dnsmasq (DNS Server)</p>
+    <pre><code>sudo apt-get install -y dnsmasq
+
+# Disable systemd-resolved (it conflicts with dnsmasq on port 53)
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+
+# Remove the symlinked resolv.conf and create a static one
+sudo rm /etc/resolv.conf
+echo 'nameserver 8.8.8.8' | sudo tee /etc/resolv.conf
+echo 'nameserver 8.8.4.4' | sudo tee -a /etc/resolv.conf</code></pre>
+
+    <p>Install Additional Utilities</p>
+    <pre><code>sudo apt-get install -y nmap curl wget git vim net-tools bind9-utils
+# bind9-utils gives you: dig, nslookup — essential for DNS testing</code></pre>
+
+    <h3>1.4 Create Your Working Directory Structure</h3>
+    <pre><code>mkdir -p ~/sno-install
+cd ~/sno-install
+
+# Copy your pull-secret here
+cp /path/to/pull-secret.json ~/sno-install/pull-secret.json
+
+# View it to confirm it's valid JSON
+cat ~/sno-install/pull-secret.json | python3 -m json.tool | head -5</code></pre>
+
+    <h3>1.5 Phase 1 Completion Checklist</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Status</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Red Hat account created</td>
+                <td>[ ] Done</td>
+                <td>console.redhat.com</td>
+            </tr>
+            <tr>
+                <td>Pull secret downloaded & saved as pull-secret.json</td>
+                <td>[ ] Done</td>
+                <td>~/sno-install/pull-secret.json</td>
+            </tr>
+            <tr>
+                <td>SSH key pair generated (sno_key + sno_key.pub)</td>
+                <td>[ ] Done</td>
+                <td>~/.ssh/sno_key.pub contents copied</td>
+            </tr>
+            <tr>
+                <td>Cluster name decided</td>
+                <td>[ ] Done</td>
+                <td>e.g., sno</td>
+            </tr>
+            <tr>
+                <td>Base domain decided</td>
+                <td>[ ] Done</td>
+                <td>e.g., mas.local</td>
+            </tr>
+            <tr>
+                <td>SNO node static IP decided</td>
+                <td>[ ] Done</td>
+                <td>e.g., 192.168.1.50</td>
+            </tr>
+            <tr>
+                <td>Bastion IP decided</td>
+                <td>[ ] Done</td>
+                <td>e.g., 192.168.1.10</td>
+            </tr>
+            <tr>
+                <td>Docker installed & verified on bastion</td>
+                <td>[ ] Done</td>
+                <td>docker run hello-world</td>
+            </tr>
+            <tr>
+                <td>oc CLI installed on bastion</td>
+                <td>[ ] Done</td>
+                <td>oc version</td>
+            </tr>
+            <tr>
+                <td>dnsmasq installed on bastion</td>
+                <td>[ ] Done</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Phase 2 — Bastion Host Full Setup</h2>
+    <p>The bastion machine is your command center. Every installer command, DNS query, and OCP management action runs from here. Set it up completely before touching the OptiPlex.</p>
+
+    <h3>2.1 Set a Static IP on the Bastion (Ubuntu)</h3>
+    <p>Your bastion needs a permanent IP so DNS clients can always find it. Find your network interface name first:</p>
+    <pre><code>ip addr show
+# Look for your ethernet adapter — usually: eth0, enp2s0, ens3, etc.
+# It will show your current IP next to 'inet'</code></pre>
+
+    <p>Edit Netplan to set a static IP:</p>
+    <pre><code>sudo nano /etc/netplan/00-installer-config.yaml
+
+# Replace contents with (adjust interface name, IP, gateway to your network):
+network:
+  version: 2
+  ethernets:
+    enp2s0:                        # <-- replace with your actual interface name
+      dhcp4: false
+      addresses: [192.168.1.10/24] # <-- your bastion's static IP
+      gateway4: 192.168.1.1        # <-- your router's IP
+      nameservers:
+        addresses: [127.0.0.1]     # <-- bastion points to itself for DNS (dnsmasq)
+
+# Apply the configuration
+sudo netplan apply
+
+# Verify the IP is set
+ip addr show enp2s0</code></pre>
+
+    <h3>2.2 Set a Static IP on the OptiPlex 5080 (Router DHCP Reservation)</h3>
+    <p>The OptiPlex runs Windows now, but after SNO install it runs RHCOS. The easiest way to guarantee a static IP is a DHCP reservation in your router, pinned to the machine's MAC address.</p>
+    <ul>
+        <li>On the OptiPlex 5080 (while it still runs Windows), open Command Prompt and run:</li>
+    </ul>
+    <pre><code>ipconfig /all</code></pre>
+    <ul>
+        <li>Look for the line: <code>Physical Address: XX-XX-XX-XX-XX-XX</code>  — write this down.</li>
+        <li>Log into your router admin page (usually http://192.168.1.1 or http://192.168.0.1)</li>
+        <li>Find 'DHCP Reservation' or 'Static DHCP' or 'Address Reservation'</li>
+        <li>Add an entry: MAC = [MAC from step 1], IP = 192.168.1.50 (your chosen SNO IP)</li>
+        <li>Save and reboot router if required.</li>
+    </ul>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> Alternatively, you can set a static IP directly in the Assisted Installer's network configuration step — we will cover that in Phase 5.
+    </div>
+
+    <h3>2.3 Verify Network Connectivity</h3>
+    <pre><code># From bastion — ping your router
+ping -c 3 192.168.1.1
+
+# Ping internet (should work)
+ping -c 3 8.8.8.8
+
+# Ping the OptiPlex (should work while Windows is running)
+ping -c 3 192.168.1.50</code></pre>
+
+    <h2>Phase 3 — DNS Setup with dnsmasq</h2>
+    <p>DNS is the most common failure point for OCP installations. OCP's Assisted Installer actually validates DNS before it lets you proceed. Get this right and the install will be smooth.</p>
+    <p>You are setting up dnsmasq on your bastion machine to act as the DNS server for your entire lab network. It will:</p>
+    <ul>
+        <li>Resolve OCP cluster names (api.sno.mas.local, *.apps.sno.mas.local) to the SNO node IP</li>
+        <li>Forward all other DNS queries to the internet (Google 8.8.8.8)</li>
+    </ul>
+
+    <h3>3.1 Configure dnsmasq</h3>
+    <p>Edit the main dnsmasq configuration file:</p>
+    <pre><code>sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
+sudo nano /etc/dnsmasq.conf</code></pre>
+    <p>Paste the following (adjust IPs and domain to match your values):</p>
+    <pre><code># ─── dnsmasq.conf for SNO OCP Lab ───────────────────────────────────
+
+# Listen on the bastion's LAN interface (replace IP with your bastion IP)
+listen-address=192.168.1.10
+listen-address=127.0.0.1
+bind-interfaces
+
+# Upstream DNS servers (internet forwarding)
+server=8.8.8.8
+server=8.8.4.4
+
+# Don't forward queries without a domain to the internet
+domain-needed
+
+# Don't forward reverse lookups for private IPs to internet
+bogus-priv
+
+# Cache 1000 entries
+cache-size=1000
+
+# ─── OCP SNO DNS Records ─────────────────────────────────────────────
+# Replace 192.168.1.50 with your actual SNO node IP
+# Replace sno.mas.local with your actual cluster.domain
+
+# OCP API endpoint
+address=/api.sno.mas.local/192.168.1.50
+
+# OCP Internal API (same IP for SNO)
+address=/api-int.sno.mas.local/192.168.1.50
+
+# Wildcard for ALL application routes (* .apps.sno.mas.local)
+address=/.apps.sno.mas.local/192.168.1.50
+
+# Explicit hostname for the SNO node itself (optional but recommended)
+address=/sno-node.sno.mas.local/192.168.1.50
+
+# ─────────────────────────────────────────────────────────────────────</code></pre>
+
+    <h3>3.2 Start and Enable dnsmasq</h3>
+    <pre><code>sudo systemctl start dnsmasq
+sudo systemctl enable dnsmasq
+sudo systemctl status dnsmasq
+# Should show: Active: active (running)</code></pre>
+
+    <h3>3.3 Configure Firewall to Allow DNS</h3>
+    <pre><code># If UFW is active (Ubuntu firewall):
+sudo ufw allow from 192.168.1.0/24 to any port 53 proto udp
+sudo ufw allow from 192.168.1.0/24 to any port 53 proto tcp
+sudo ufw reload
+
+# Check UFW status
+sudo ufw status</code></pre>
+
+    <h3>3.4 Test DNS Resolution (CRITICAL)</h3>
+    <p>These tests MUST all pass before you proceed:</p>
+    <p>Test 1: API endpoint resolves to SNO IP</p>
+    <pre><code>dig @192.168.1.10 api.sno.mas.local
+# Expected output: should show 192.168.1.50 in the ANSWER SECTION</code></pre>
+    <p>Test 2: Internal API resolves to SNO IP</p>
+    <pre><code>dig @192.168.1.10 api-int.sno.mas.local
+# Expected: 192.168.1.50</code></pre>
+    <p>Test 3: Wildcard apps route resolves to SNO IP</p>
+    <pre><code>dig @192.168.1.10 anything.apps.sno.mas.local
+dig @192.168.1.10 console-openshift-console.apps.sno.mas.local
+# Expected: 192.168.1.50 for both</code></pre>
+    <p>Test 4: Internet forwarding still works</p>
+    <pre><code>dig @192.168.1.10 google.com
+# Expected: Should resolve to Google's IPs (not 192.168.1.50)</code></pre>
+
+    <div class="alert">
+        <strong>🚨 CRITICAL:</strong> Do NOT continue to Phase 4 until ALL four DNS tests pass. If the Assisted Installer cannot resolve the DNS records, installation will fail at the network validation step.
+    </div>
+
+    <h3>3.5 Point Bastion and All Client PCs to dnsmasq</h3>
+    <p>Every machine that needs to access the OCP console or Maximo Manage must use your bastion as its DNS server.</p>
+
+    <p>On the Bastion (already done in Phase 2)</p>
+    <p>The bastion's <code>/etc/resolv.conf</code> already has <code>nameserver 127.0.0.1</code>.</p>
+
+    <p>On Other Windows PCs / Laptops on the Same Network</p>
+    <ul>
+        <li>Open Network & Internet Settings → Change adapter options</li>
+        <li>Right-click your network adapter → Properties → Internet Protocol Version 4 (IPv4)</li>
+        <li>Select 'Use the following DNS server addresses'</li>
+        <li>Preferred DNS server: 192.168.1.10  (your bastion IP)</li>
+        <li>Alternate DNS server: 8.8.8.8</li>
+        <li>Click OK → Close</li>
+    </ul>
+
+    <p>Option: Configure Router to Push dnsmasq to All DHCP Clients</p>
+    <p>Alternatively, set your router's DNS server field to 192.168.1.10. This automatically gives every device on the network access to your DNS — no per-machine configuration needed.</p>
+
+    <h3>3.6 DNS Setup Checklist</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Test</th>
+                <th>Command</th>
+                <th>Expected Result</th>
+                <th>Pass?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>api resolves</td>
+                <td><code>dig @192.168.1.10 api.sno.mas.local</code></td>
+                <td>192.168.1.50</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>api-int resolves</td>
+                <td><code>dig @192.168.1.10 api-int.sno.mas.local</code></td>
+                <td>192.168.1.50</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Wildcard resolves</td>
+                <td><code>dig @192.168.1.10 test.apps.sno.mas.local</code></td>
+                <td>192.168.1.50</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Internet forwards</td>
+                <td><code>dig @192.168.1.10 google.com</code></td>
+                <td>Actual Google IPs</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>dnsmasq running</td>
+                <td><code>systemctl status dnsmasq</code></td>
+                <td>active (running)</td>
+                <td>[ ]</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Phase 4 — Network & Pre-Install Preparation</h2>
+
+    <h3>4.1 Verify Internet Access from Bastion</h3>
+    <p>The bastion needs to reach these specific domains (used by the Assisted Installer and OCP install):</p>
+    <pre><code>curl -I https://api.openshift.com
+curl -I https://quay.io
+curl -I https://registry.redhat.io
+curl -I https://mirror.openshift.com
+# All should return HTTP 200 or 301/302 (not connection refused or timeout)</code></pre>
+
+    <h3>4.2 Verify OptiPlex BIOS Settings</h3>
+    <p>Boot the OptiPlex 5080 into BIOS (press F2 at startup) and verify:</p>
+
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>BIOS Setting</th>
+                <th>Required Value</th>
+                <th>How to Find It</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Secure Boot</td>
+                <td>DISABLED</td>
+                <td>Security → Secure Boot → Disable</td>
+            </tr>
+            <tr>
+                <td>UEFI Boot Mode</td>
+                <td>UEFI (not Legacy/CSM)</td>
+                <td>General → Boot Sequence → UEFI</td>
+            </tr>
+            <tr>
+                <td>Virtualization (VT-x)</td>
+                <td>ENABLED</td>
+                <td>Virtualization Support → Enable VT for Direct I/O</td>
+            </tr>
+            <tr>
+                <td>Boot from USB</td>
+                <td>ENABLED / first in boot order</td>
+                <td>General → Boot Sequence — move USB to top</td>
+            </tr>
+            <tr>
+                <td>Network Boot (PXE)</td>
+                <td>Not required — can be disabled</td>
+                <td>Optional</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="alert">
+        <strong>🚨 CRITICAL:</strong> Secure Boot MUST be disabled. RHCOS (Red Hat CoreOS) installs fine on UEFI, but Secure Boot will block unsigned kernels and prevent the system from booting after installation.
+    </div>
+
+    <h3>4.3 Prepare USB Drive for Discovery ISO</h3>
+    <p>You need a USB drive of at least 8 GB. The discovery ISO is typically 1-2 GB.</p>
+
+    <p>Option A: Write ISO on Linux (bastion)</p>
+    <pre><code># AFTER downloading the ISO from Assisted Installer (Phase 5):
+
+# Identify your USB device (plug it in, then run:)
+lsblk
+# Look for the USB drive — e.g., /dev/sdb, /dev/sdc
+# Verify the size matches your USB drive (e.g., 8GB = ~7.5G listed)
+
+# UNMOUNT it first if auto-mounted
+sudo umount /dev/sdX1   # replace X with your actual letter
+
+# Write the ISO (REPLACE /dev/sdX with your actual USB device — e.g., /dev/sdb)
+# WARNING: This will erase everything on the USB drive
+sudo dd if=~/sno-install/discovery.iso of=/dev/sdX bs=4M status=progress oflag=sync
+sync</code></pre>
+
+    <p>Option B: Write ISO on Windows</p>
+    <ul>
+        <li>Download Rufus from https://rufus.ie (free, no install needed)</li>
+        <li>Insert USB drive → Select the ISO file → Select 'DD Image' write mode → Click START</li>
+    </ul>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> In Rufus, you MUST select 'DD Image' mode (not ISO mode) when prompted. This is asked after you click Start.
+    </div>
+
+    <h3>4.4 Make a Final Backup of the OptiPlex</h3>
+    <div class="alert">
+        <strong>🚨 CRITICAL:</strong> The OptiPlex 5080 will be COMPLETELY ERASED. Red Hat CoreOS takes over the entire disk. Any Windows data, installed applications, documents — all gone. Back up anything important now.
+    </div>
+    <pre><code># On the OptiPlex Windows machine — check what's there:
+# - Documents, Desktop, Downloads
+# - Any software licenses, keys stored on the machine
+# - Bookmarks, saved passwords
+# Copy to external drive or network share before proceeding</code></pre>
+
+    <h2>Phase 5 — Generating the Discovery ISO (Assisted Installer)</h2>
+    <p>The Red Hat Assisted Installer is a web-based wizard at console.redhat.com. It builds a customized bootable ISO specific to your cluster. When your OptiPlex boots from this ISO, it connects back to Red Hat's console and the installer completes the process.</p>
+
+    <h3>5.1 Open the Assisted Installer</h3>
+    <ul>
+        <li>Open a browser on your bastion (or any PC with internet access)</li>
+        <li>Go to: https://console.redhat.com/openshift</li>
+        <li>Log in with your Red Hat account</li>
+        <li>Click the blue button: 'Create cluster'</li>
+        <li>Select the 'Datacenter' tab</li>
+        <li>Click: 'Create cluster' under 'Assisted Installer'</li>
+    </ul>
+
+    <h3>5.2 Cluster Details Page</h3>
+    <p>Fill in the form exactly as follows:</p>
+
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>What to Enter</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cluster name</td>
+                <td>Your chosen cluster name (NO spaces, lowercase)</td>
+                <td>sno</td>
+            </tr>
+            <tr>
+                <td>Base domain</td>
+                <td>Your chosen domain (NO http, just the domain)</td>
+                <td>mas.local</td>
+            </tr>
+            <tr>
+                <td>OpenShift version</td>
+                <td>Select latest stable 4.16.x or 4.17.x</td>
+                <td>4.16.45</td>
+            </tr>
+            <tr>
+                <td>CPU architecture</td>
+                <td>x86_64</td>
+                <td>x86_64</td>
+            </tr>
+            <tr>
+                <td>High Availability Mode</td>
+                <td>SINGLE NODE — select 'Install single node OpenShift (SNO)'</td>
+                <td>SNO</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> The Cluster name + Base domain combination is PERMANENT. Double check before clicking Next. If you made a mistake, delete the cluster and start a new one.
+    </div>
+    <p>Click 'Next' after filling in all fields</p>
+
+    <h3>5.3 Operators Page</h3>
+    <p>You will see optional operators to install. For the MAS trial:</p>
+    <ul>
+        <li>OpenShift Virtualization — NOT needed now</li>
+        <li>OpenShift Data Foundation — NOT needed (we will use LVM instead)</li>
+        <li>Leave all checkboxes empty</li>
+        <li>Click 'Next'</li>
+    </ul>
+
+    <h3>5.4 Host Discovery — ISO Configuration</h3>
+    <h4>5.4.1 Paste Your Pull Secret</h4>
+    <ul>
+        <li>You will see a field for 'Pull secret'</li>
+        <li>Open your pull-secret.json file on the bastion:</li>
+    </ul>
+    <pre><code>cat ~/sno-install/pull-secret.json</code></pre>
+    <ul>
+        <li>Copy the entire JSON content</li>
+        <li>Paste it into the Pull secret field in the browser</li>
+    </ul>
+
+    <h4>5.4.2 SSH Public Key</h4>
+    <ul>
+        <li>Open a terminal on the bastion and display your public key:</li>
+    </ul>
+    <pre><code>cat ~/.ssh/sno_key.pub</code></pre>
+    <ul>
+        <li>Copy the entire output (starts with <code>ssh-ed25519 AAAA...</code>)</li>
+        <li>Paste it into the 'SSH public key' field</li>
+    </ul>
+
+    <h4>5.4.3 Image Type</h4>
+    <ul>
+        <li>Under 'Minimal ISO' vs 'Full ISO':</li>
+        <li>Select: Full image file — Includes everything needed for offline environments</li>
+        <li>Full ISO is larger (~1 GB) but more reliable on bare metal hardware with unusual drivers</li>
+        <li>Click 'Generate Discovery ISO'</li>
+        <li>Wait ~30 seconds for generation</li>
+        <li>Click 'Download Discovery ISO'</li>
+        <li>Save as: <code>~/sno-install/discovery.iso</code></li>
+    </ul>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> The ISO is valid for a limited time. Use it within a few days of generation.
+    </div>
+
+    <h3>5.5 Write the ISO to USB and Boot</h3>
+    <p>Follow the steps in Phase 4.3 to write the ISO to your USB drive, then:</p>
+    <ul>
+        <li>Plug the USB into the OptiPlex 5080</li>
+        <li>Power ON the OptiPlex</li>
+        <li>Press F12 when the Dell logo appears (boot menu)</li>
+        <li>Select the USB drive from the boot menu</li>
+        <li>The machine will boot into the RHCOS Live environment</li>
+        <li>It shows a terminal output screen — this is normal. Do not interact with it.</li>
+        <li>Back in your browser at console.redhat.com — the OptiPlex will appear in the 'Host Discovery' section within 3-5 minutes</li>
+    </ul>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> If the host doesn't appear after 5 minutes: check that your router assigned the correct IP to the OptiPlex, verify network cables are connected, and ensure the OptiPlex can reach the internet (needed for check-in to Red Hat's Assisted Installer service).
+    </div>
+
+    <h2>Phase 6 — Running the SNO Installation</h2>
+    <p>Once the OptiPlex boots from the ISO and appears in the Assisted Installer, you complete the install wizard. The actual OCP install then runs unattended.</p>
+
+    <h3>6.1 Host Discovery — Configure the Discovered Host</h3>
+    <ul>
+        <li>In the browser, you will see a row appear under 'Host inventory' for your discovered machine</li>
+        <li>It shows: hostname (auto-generated), status 'Discovering...' then 'Ready'</li>
+        <li>Once it shows 'Ready', click the host row to expand it</li>
+        <li>Verify the details:</li>
+        <li>CPU: should show 8 cores / 16 threads</li>
+        <li>Memory: should show ~31 GB available</li>
+        <li>Disk: should show the 477 GB NVMe SSD</li>
+        <li>Optionally rename the hostname by clicking the pencil icon — e.g., set to 'sno.mas.local'</li>
+    </ul>
+
+    <h4>6.1.1 Configure Static IP in the Installer</h4>
+    <p>If you did NOT set up a DHCP reservation in your router, set the static IP here:</p>
+    <ul>
+        <li>Click on the host row → 'Edit host' → 'Network configuration'</li>
+        <li>Set:</li>
+        <li>IP Address: 192.168.1.50 (your chosen SNO IP)</li>
+        <li>Prefix length: 24 (for /24 subnet)</li>
+        <li>Gateway: 192.168.1.1 (your router)</li>
+        <li>DNS: 192.168.1.10 (your bastion running dnsmasq)</li>
+        <li>Click Save</li>
+    </ul>
+
+    <h3>6.2 Storage Selection</h3>
+    <ul>
+        <li>Scroll down to 'Installation Disks'</li>
+        <li>Your 477 GB SSD should be listed — select it as the installation disk</li>
+        <li>If you see multiple disks — select the PRIMARY SSD (the largest)</li>
+    </ul>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> The selected disk will be COMPLETELY erased and formatted as RHCOS. Everything on it is gone.
+    </div>
+
+    <h3>6.3 Networking — Cluster Networking</h3>
+    <ul>
+        <li>Click 'Next' to proceed to the Networking page</li>
+        <li>The installer shows detected network interfaces and subnets</li>
+        <li>Under 'Cluster network CIDR': leave defaults (10.128.0.0/14)</li>
+        <li>Under 'Service network CIDR': leave defaults (172.30.0.0/16)</li>
+        <li>Machine network should show: 192.168.1.0/24 (your LAN subnet)</li>
+        <li>Verify that the API VIP and Ingress VIP fields are NOT shown (SNO doesn't need them — it uses the node IP directly)</li>
+    </ul>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> In SNO mode, there is no VIP (Virtual IP). Both API and app traffic go directly to the single node's IP. This is simpler but means there's no failover.
+    </div>
+
+    <h3>6.4 Review & Validation</h3>
+    <ul>
+        <li>Click 'Next' to reach the Review page</li>
+        <li>The installer runs automatic validations. You should see green checkmarks for:</li>
+        <li>DNS Wildcard: *.apps.sno.mas.local → 192.168.1.50 ✓</li>
+        <li>API DNS: api.sno.mas.local → 192.168.1.50 ✓</li>
+        <li>API-Int DNS: api-int.sno.mas.local → 192.168.1.50 ✓</li>
+        <li>Network connectivity ✓</li>
+        <li>NTP (time sync) ✓</li>
+        <li>Disk available ✓</li>
+    </ul>
+
+    <div class="alert">
+        <strong>🚨 CRITICAL:</strong> If any DNS validation FAILS (shows red): do NOT proceed. Go back to Phase 3, re-verify your dnsmasq config, restart dnsmasq, and re-run the DNS dig tests. The install will fail if DNS is broken.
+    </div>
+
+    <h3>6.5 Start the Installation</h3>
+    <p>Once ALL validations show green, click 'Install cluster' A progress bar appears — track the phases:</p>
+
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>What's Happening</th>
+                <th>Approx Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Preparing</td>
+                <td>Generating ignition configs, writing to ISO bootstrap</td>
+                <td>2-5 min</td>
+            </tr>
+            <tr>
+                <td>Installing</td>
+                <td>Writing RHCOS to disk, applying ignition config</td>
+                <td>10-20 min</td>
+            </tr>
+            <tr>
+                <td>Rebooting</td>
+                <td>Machine reboots from disk (remove USB after first reboot)</td>
+                <td>5 min</td>
+            </tr>
+            <tr>
+                <td>Configuring control plane</td>
+                <td>etcd, API server, controller manager starting</td>
+                <td>15-25 min</td>
+            </tr>
+            <tr>
+                <td>Bootstrapping</td>
+                <td>Cluster operators deploying (40+ operators)</td>
+                <td>20-40 min</td>
+            </tr>
+            <tr>
+                <td>Finalizing</td>
+                <td>Last operators reconciling, ingress deploying</td>
+                <td>5-10 min</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> Total installation time: 45-90 minutes. The machine reboots 2-3 times during the process. This is normal. Do NOT power off the machine.
+    </div>
+
+    <h3>6.6 Monitor Installation Progress</h3>
+    <p>Watch the Assisted Installer progress bar in your browser. You can also ssh into the node during installation (using the key you provided) to watch logs:</p>
+    <pre><code># From bastion — SSH into the SNO node during install (RHCOS default user is 'core')
+ssh -i ~/.ssh/sno_key core@192.168.1.50
+
+# Watch bootstrap logs during install
+sudo journalctl -b -f
+
+# Or watch specific cluster operator status
+sudo journalctl -u release-image.service -f</code></pre>
+
+    <h3>6.7 Remove the USB Drive</h3>
+    <p>After the installation writes the OS to disk and the machine reboots for the first time (~15-20 minutes in), remove the USB drive. If the machine boots back into the USB, it will restart the installation from scratch.</p>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> Watch the Assisted Installer — when it shows 'Writing disk image complete' and the machine reboots, immediately remove the USB. The machine must then boot from the internal SSD.
+    </div>
+
+    <h3>6.8 Installation Complete</h3>
+    <p>When the Assisted Installer shows 'Installation complete' and 'Cluster installed successfully':</p>
+    <ul>
+        <li>The OCP web console URL is displayed: https://console-openshift-console.apps.sno.mas.local</li>
+        <li>Click 'Download kubeconfig' — save as: <code>~/sno-install/kubeconfig</code></li>
+        <li>Note the kubeadmin password shown on screen — copy it somewhere safe</li>
+        <li>Click 'Open Web Console' — your browser opens the OCP console</li>
+    </ul>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> If the browser shows a certificate warning (SSL), this is expected — SNO generates self-signed certificates by default. Click 'Advanced' → 'Accept the risk and continue' in Firefox, or 'Proceed anyway' in Chrome.
+    </div>
+
+    <h2>Phase 7 — Post-Install OCP Verification</h2>
+    <p>Installation complete does not mean the cluster is fully healthy. You must verify that all cluster operators and nodes are in a good state before proceeding to storage or MAS.</p>
+
+    <h3>7.1 Configure kubectl/oc Access on Bastion</h3>
+    <pre><code># Copy the kubeconfig you downloaded
+mkdir -p ~/.kube
+cp ~/sno-install/kubeconfig ~/.kube/config
+
+# Set permissions
+chmod 600 ~/.kube/config
+
+# Verify connection to the cluster
+oc whoami
+# Expected output: system:admin
+
+oc cluster-info
+# Expected: shows API server URL and console URL</code></pre>
+
+    <h3>7.2 Verify Node Status</h3>
+    <pre><code>oc get nodes
+# Expected output:
+# NAME                     STATUS   ROLES                         AGE   VERSION
+# sno.mas.local            Ready    control-plane,master,worker   15m   v1.29.x
+
+# If STATUS shows NotReady — wait 5-10 minutes and try again
+# If still NotReady after 20 min — check node logs (Phase 7.5)</code></pre>
+
+    <h3>7.3 Verify Cluster Operators</h3>
+    <p>This is the most important check. All cluster operators must be AVAILABLE=True and not PROGRESSING or DEGRADED.</p>
+    <pre><code>oc get clusteroperators
+# You should see ~30+ operators listed
+# All rows should show:
+#   AVAILABLE=True, PROGRESSING=False, DEGRADED=False
+
+# Quick check — list any operators NOT in good state:
+oc get co | grep -v 'True.*False.*False'
+# This should return NOTHING (meaning all are healthy)
+
+# Check OCP version
+oc get clusterversion
+# Should show: Cluster version is &lt;version&gt;</code></pre>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> Right after install, some operators may still show PROGRESSING=True — this is normal. Wait 10-15 minutes and recheck. The image-registry operator will show DEGRADED until you configure storage (Phase 9).
+    </div>
+
+    <h3>7.4 Verify All Pods in kube-system Namespaces</h3>
+    <pre><code># Check core OCP pods
+oc get pods -n openshift-etcd
+oc get pods -n openshift-apiserver
+oc get pods -n openshift-controller-manager
+oc get pods -n openshift-ingress
+oc get pods -n openshift-dns
+
+# All should show STATUS = Running
+# Some may show Completed — that's also fine (they are one-time jobs)</code></pre>
+
+    <h3>7.5 Log Into the OCP Web Console</h3>
+    <ul>
+        <li>Open browser on bastion: https://console-openshift-console.apps.sno.mas.local</li>
+        <li>Accept the SSL certificate warning</li>
+        <li>Login with:</li>
+        <li>Username: kubeadmin</li>
+        <li>Password: [the password shown in Assisted Installer after install]</li>
+        <li>You should see the OCP Dashboard — Overview page with cluster health</li>
+        <li>Navigate to: Compute → Nodes — verify 1 node shows as 'Ready'</li>
+        <li>Navigate to: Operators → Installed Operators — shows platform operators</li>
+    </ul>
+
+    <h3>7.6 Verify Cluster Version and Update Channel</h3>
+    <pre><code>oc get clusterversion -o jsonpath='{.items[0].status.desired.version}'
+# Should show your installed OCP version, e.g.: 4.16.45
+
+# Check cluster ID (unique identifier)
+oc get clusterversion -o jsonpath='{.items[0].spec.clusterID}'</code></pre>
+
+    <h3>7.7 Enable SSH Access to the Node (Optional but Useful)</h3>
+    <pre><code># Test SSH access to the SNO node using the key you provided
+ssh -i ~/.ssh/sno_key core@192.168.1.50
+
+# Inside the node — check system resources
+free -h       # RAM usage
+df -h         # Disk usage
+nproc         # CPU count
+exit</code></pre>
+
+    <h2>Phase 8 — LVM Storage Operator Setup</h2>
+    <p>OpenShift requires Persistent Volumes (PVs) for many workloads — including the internal image registry and later for MAS/Manage databases. On bare metal SNO with a single SSD, the LVM Storage Operator creates a storage class that carves PVs from available disk space.</p>
+
+    <h3>8.1 Find Available Disks on the Node</h3>
+    <p>First, check what disk partitions exist and what space is available:</p>
+    <pre><code># SSH into the node
+ssh -i ~/.ssh/sno_key core@192.168.1.50
+
+# List all block devices
+lsblk
+# You should see:
+#  nvme0n1  (main SSD — this is the boot disk)
+#    nvme0n1p1  (EFI partition)
+#    nvme0n1p2  (RHCOS boot)
+#    nvme0n1p3  (RHCOS root)
+#    nvme0n1p4  (RHCOS var — this has most free space)
+
+# Check free disk space
+df -h /var
+
+exit</code></pre>
+
+    <div class="note">
+        <strong>⚠ NOTE:</strong> Since you only have ONE SSD (no second disk), the LVM Operator will create a thin-provisioned volume group on top of the available free space on your NVMe. This works for a trial but is less performant than a dedicated second disk.
+    </div>
+
+    <h3>8.2 Install the LVM Storage Operator via OCP Console</h3>
+    <p>Step 1: Go to OperatorHub</p>
+    <ul>
+        <li>In the OCP Web Console, click: Operators (left sidebar) → OperatorHub</li>
+        <li>In the search box, type: LVM Storage</li>
+        <li>You should see 'LVM Storage' from Red Hat — click it</li>
+        <li>Click 'Install'</li>
+    </ul>
+
+    <p>Step 2: Configure Installation</p>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value to Set</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Update channel</td>
+                <td>stable-4.16 (match your OCP version)</td>
+            </tr>
+            <tr>
+                <td>Installation mode</td>
+                <td>A specific namespace on the cluster</td>
+            </tr>
+            <tr>
+                <td>Installed Namespace</td>
+                <td>openshift-storage (create if prompted)</td>
+            </tr>
+            <tr>
+                <td>Update approval</td>
+                <td>Automatic</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>Click 'Install'</li>
+        <li>Wait 2-3 minutes for the operator to install</li>
+        <li>Navigate to: Operators → Installed Operators → verify 'LVM Storage' shows 'Succeeded'</li>
+    </ul>
+
+    <h3>8.3 Create an LVMCluster Custom Resource</h3>
+    <p>This step tells the LVM Operator to create the actual storage volume group on your disk.</p>
+    <p>Via the Web Console</p>
+    <ul>
+        <li>In the OCP Console: Operators → Installed Operators → LVM Storage</li>
+        <li>Click 'Create instance' under LVMCluster</li>
+        <li>Switch to YAML view and paste the following:</li>
+    </ul>
+    <pre><code>apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: my-lvmcluster
+  namespace: openshift-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: vg1
+      thinPoolConfig:
+        name: thin-pool-1
+        sizePercent: 90
+        overprovisionRatio: 10</code></pre>
+    <ul>
+        <li>Click 'Create'</li>
+        <li>Wait 2-3 minutes for the LVMCluster to show status 'Ready'</li>
+    </ul>
+
+    <h3>8.4 Alternatively: Install via CLI</h3>
+    <p>If you prefer using the command line from the bastion:</p>
+    <pre><code># Create the openshift-storage namespace
+oc create namespace openshift-storage
+
+# Create the operator group
+cat &lt;&lt;EOF | oc apply -f -
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-storage-operatorgroup
+  namespace: openshift-storage
+spec:
+  targetNamespaces:
+  - openshift-storage
+EOF
+
+# Create the subscription to install the operator
+cat &lt;&lt;EOF | oc apply -f -
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: lvms-operator
+  namespace: openshift-storage
+spec:
+  channel: stable-4.16
+  installPlanApproval: Automatic
+  name: lvms-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+# Wait for operator to be ready
+oc wait --for=condition=Available deployment/lvms-operator -n openshift-storage --timeout=300s
+
+# Create the LVMCluster
+cat &lt;&lt;EOF | oc apply -f -
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: my-lvmcluster
+  namespace: openshift-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: vg1
+      thinPoolConfig:
+        name: thin-pool-1
+        sizePercent: 90
+        overprovisionRatio: 10
+EOF</code></pre>
+
+    <h3>8.5 Verify LVM Storage Is Working</h3>
+    <pre><code># Check LVMCluster status
+oc get lvmcluster -n openshift-storage
+# Should show: STATUS = Ready
+
+# List the storage classes created
+oc get storageclass
+# Should show: lvms-vg1   (this is your new storage class)
+
+# Set lvms-vg1 as the default storage class
+oc patch storageclass lvms-vg1 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+# Verify it is now default (shows (default) next to name)
+oc get storageclass</code></pre>
+
+    <h3>8.6 Test PV Provisioning with a Test PVC</h3>
+    <pre><code># Create a test PVC to verify dynamic provisioning works
+cat &lt;&lt;EOF | oc apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: lvms-vg1
+EOF
+
+# Check it is bound (may take 30-60 seconds)
+oc get pvc test-pvc -n default
+# Should show: STATUS = Bound
+
+# Clean up the test PVC
+oc delete pvc test-pvc -n default</code></pre>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> If the PVC stays in 'Pending' for more than 2 minutes, check the LVM Operator logs: <code>oc logs -n openshift-storage deployment/lvms-operator</code>
+    </div>
+
+    <h2>Phase 9 — Image Registry Configuration</h2>
+    <p>On bare metal OCP, the internal image registry is disabled after installation because there is no default storage class pre-configured. Now that LVM storage is ready, you must enable and configure it. This is required for many OCP features and is a mandatory prerequisite for MAS.</p>
+
+    <h3>9.1 Enable the Image Registry</h3>
+    <p>First, change the registry's managementState from Removed to Managed:</p>
+    <pre><code>oc patch configs.imageregistry.operator.openshift.io cluster \
+--type merge \
+--patch '{"spec":{"managementState":"Managed"}}'
+
+# Verify the patch was applied
+oc get configs.imageregistry.operator.openshift.io cluster -o yaml | grep managementState
+# Should show: managementState: Managed</code></pre>
+
+    <h3>9.2 Configure Persistent Storage for the Image Registry</h3>
+    <p>Now attach the LVM storage to the registry using a PVC:</p>
+    <pre><code>oc patch configs.imageregistry.operator.openshift.io cluster \
+--type merge \
+--patch '{
+  "spec": {
+    "storage": {
+      "pvc": {
+        "claim": ""
+      }
+    }
+  }
+}'
+
+# This causes OCP to auto-create a PVC called 'image-registry-storage'
+# Verify the PVC was created and is Bound:
+oc get pvc -n openshift-image-registry
+# Should show: image-registry-storage   Bound</code></pre>
+
+    <h3>9.3 Enable External Route to the Registry (Optional)</h3>
+    <pre><code>oc patch configs.imageregistry.operator.openshift.io cluster \
+--type merge \
+--patch '{"spec":{"defaultRoute":true}}'
+
+# This creates a route: default-route-openshift-image-registry.apps.sno.mas.local
+# Verify:
+oc get route -n openshift-image-registry</code></pre>
+
+    <h3>9.4 Verify Registry Is Running</h3>
+    <pre><code># Check registry pods
+oc get pods -n openshift-image-registry
+# Should show: image-registry-XXXX pod with STATUS = Running
+
+# Check the cluster operator status
+oc get co image-registry
+# Should show: AVAILABLE=True, PROGRESSING=False, DEGRADED=False
+
+# Verify the registry PVC is bound
+oc get pvc -n openshift-image-registry
+# STATUS should be: Bound</code></pre>
+
+    <h2>Phase 10 — OCP Cluster Health Checklist</h2>
+    <p>Run through every item below. Every item should pass before you consider the RHOCP installation complete and ready for MAS.</p>
+
+    <h3>10.1 Full Verification Script</h3>
+    <p>Run these commands from the bastion and verify the expected outputs:</p>
+    <pre><code>echo '=== NODE STATUS ==='
+oc get nodes
+echo ''
+
+echo '=== CLUSTER VERSION ==='
+oc get clusterversion
+echo ''
+
+echo '=== ALL CLUSTER OPERATORS ==='
+oc get co
+echo ''
+
+echo '=== CHECK FOR DEGRADED OPERATORS ==='
+oc get co | grep -v 'True.*False.*False'
+echo '(empty = all healthy)'
+echo ''
+
+echo '=== STORAGE CLASS ==='
+oc get storageclass
+echo ''
+
+echo '=== IMAGE REGISTRY PVC ==='
+oc get pvc -n openshift-image-registry
+echo ''
+
+echo '=== IMAGE REGISTRY PODS ==='
+oc get pods -n openshift-image-registry
+echo ''
+
+echo '=== LVM PODS ==='
+oc get pods -n openshift-storage
+echo ''
+
+echo '=== ETCD HEALTH ==='
+oc get pods -n openshift-etcd
+echo ''
+
+echo '=== INGRESS PODS ==='
+oc get pods -n openshift-ingress</code></pre>
+
+    <h3>10.2 Final Checklist — All Must Be Green</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Check</th>
+                <th>Command</th>
+                <th>Pass Condition</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Single node is Ready</td>
+                <td><code>oc get nodes</code></td>
+                <td>STATUS = Ready, ROLES = control-plane,master,worker</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>OCP version shows correctly</td>
+                <td><code>oc get clusterversion</code></td>
+                <td>Shows installed version, no errors</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>All cluster operators healthy</td>
+                <td><code>oc get co | grep -v 'True.*False.*False'</code></td>
+                <td>Returns EMPTY (no degraded operators)</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>image-registry operator healthy</td>
+                <td><code>oc get co image-registry</code></td>
+                <td>Available=True, Degraded=False</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>LVM storage class exists</td>
+                <td><code>oc get storageclass</code></td>
+                <td>lvms-vg1 listed, marked (default)</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>LVM operator pods running</td>
+                <td><code>oc get pods -n openshift-storage</code></td>
+                <td>All pods Running or Completed</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Image registry PVC bound</td>
+                <td><code>oc get pvc -n openshift-image-registry</code></td>
+                <td>image-registry-storage = Bound</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Image registry pod running</td>
+                <td><code>oc get pods -n openshift-image-registry</code></td>
+                <td>image-registry pod = Running</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>etcd pods healthy</td>
+                <td><code>oc get pods -n openshift-etcd</code></td>
+                <td>etcd pods = Running</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Ingress pods healthy</td>
+                <td><code>oc get pods -n openshift-ingress</code></td>
+                <td>router pods = Running</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>OCP Web Console accessible</td>
+                <td>Open browser → https://console-openshift-console.apps...</td>
+                <td>Login page loads</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>kubeadmin can log in</td>
+                <td>Log into web console</td>
+                <td>Dashboard visible, no errors</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>Test PVC can be created</td>
+                <td>See Phase 8.6 test</td>
+                <td>PVC goes to Bound state</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>DNS resolves from bastion</td>
+                <td><code>dig api.sno.mas.local</code></td>
+                <td>Returns 192.168.1.50</td>
+                <td>[ ]</td>
+            </tr>
+            <tr>
+                <td>SSH to node works</td>
+                <td><code>ssh -i ~/.ssh/sno_key core@192.168.1.50</code></td>
+                <td>Node shell opens</td>
+                <td>[ ]</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>✅ TIP:</strong> Once all 15 checkboxes above are ticked, your RHOCP / SNO installation is complete and production-ready for the MAS installation phase. Save this document with your filled-in values for future reference.
+    </div>
+
+    <h2>Appendix A — Troubleshooting</h2>
+
+    <h3>A.1 Node Not Appearing in Assisted Installer</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Cause</th>
+                <th>How to Diagnose</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>No internet on OptiPlex</td>
+                <td>SSH into node (if possible) and ping 8.8.8.8</td>
+                <td>Check cable, router DHCP, try different port</td>
+            </tr>
+            <tr>
+                <td>Wrong boot order in BIOS</td>
+                <td>Machine boots Windows instead of USB</td>
+                <td>Press F12, select USB, or change BIOS boot order</td>
+            </tr>
+            <tr>
+                <td>USB write failed</td>
+                <td>Machine shows error or boots to BIOS</td>
+                <td>Re-write ISO with Rufus in DD mode, try different USB</td>
+            </tr>
+            <tr>
+                <td>Firewall blocking check-in</td>
+                <td>Node can ping internet but doesn't appear</td>
+                <td>Ensure port 443 outbound is not blocked</td>
+            </tr>
+            <tr>
+                <td>ISO expired</td>
+                <td>Node appears then disappears</td>
+                <td>Generate a new Discovery ISO from Assisted Installer</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>A.2 DNS Validation Fails in Assisted Installer</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Error Message</th>
+                <th>Cause</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>'Could not resolve api.sno.mas.local'</td>
+                <td>DNS A record not found</td>
+                <td>Check dnsmasq config, restart dnsmasq, test with dig</td>
+            </tr>
+            <tr>
+                <td>'Wildcard DNS not configured'</td>
+                <td>*.apps DNS not resolving</td>
+                <td>Verify address=/.apps.sno.mas.local/192.168.1.50 in dnsmasq.conf</td>
+            </tr>
+            <tr>
+                <td>dnsmasq says 'FAILED to listen on port 53'</td>
+                <td>systemd-resolved still running</td>
+                <td>sudo systemctl stop systemd-resolved && sudo systemctl disable systemd-resolved</td>
+            </tr>
+            <tr>
+                <td>DNS resolves on bastion but not on node</td>
+                <td>Node using wrong DNS server</td>
+                <td>Set DNS to bastion IP in Assisted Installer network config</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>A.3 Installation Hangs or Fails</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Stage</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Writing disk image</td>
+                <td>Progress stuck at X% for 20+ min</td>
+                <td>Machine may have booted back from USB — remove USB, let it continue or restart install</td>
+            </tr>
+            <tr>
+                <td>Bootstrap complete</td>
+                <td>'Waiting for bootstrap to complete' timeout</td>
+                <td>SSH in and check: <code>sudo journalctl -u bootkube.service -f</code></td>
+            </tr>
+            <tr>
+                <td>Cluster operators</td>
+                <td>'Waiting for cluster operators' timeout (>60 min)</td>
+                <td>Check specific failing operator: <code>oc describe co &lt;name&gt;</code></td>
+            </tr>
+            <tr>
+                <td>etcd</td>
+                <td>etcd pods crash-looping</td>
+                <td>Time sync issue — verify NTP working: <code>sudo timedatectl status</code></td>
+            </tr>
+            <tr>
+                <td>image-registry degraded</td>
+                <td>DEGRADED=True on image-registry operator</td>
+                <td>Normal until Phase 9 — complete LVM + image registry config</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>A.4 LVM Operator Issues</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Problem</th>
+                <th>Diagnosis Command</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>LVMCluster stuck in 'Progressing'</td>
+                <td><code>oc describe lvmcluster my-lvmcluster -n openshift-storage</code></td>
+                <td>Check events — often disk is too small or already partitioned</td>
+            </tr>
+            <tr>
+                <td>No lvms-vg1 storage class created</td>
+                <td><code>oc get storageclass</code></td>
+                <td>Verify LVMCluster is Ready; check operator pod logs</td>
+            </tr>
+            <tr>
+                <td>PVC stuck in Pending</td>
+                <td><code>oc describe pvc &lt;name&gt;</code></td>
+                <td>Check events for 'no space left' or 'no matching storage class'</td>
+            </tr>
+            <tr>
+                <td>topolvm-node pods crashing</td>
+                <td><code>oc logs &lt;pod&gt; -n openshift-storage</code></td>
+                <td>Node may not have LVM tools — check if RHCOS has lvm2 installed</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>A.5 Can't Access OCP Console in Browser</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Symptom</th>
+                <th>Cause</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>'Site cannot be reached' / timeout</td>
+                <td>DNS not resolving on your PC</td>
+                <td>Set DNS on your PC to bastion IP (192.168.1.10)</td>
+            </tr>
+            <tr>
+                <td>Connection reset / refused</td>
+                <td>Ingress router not running</td>
+                <td><code>oc get pods -n openshift-ingress</code> — fix any crashloop pods</td>
+            </tr>
+            <tr>
+                <td>SSL certificate error blocks access</td>
+                <td>Self-signed cert</td>
+                <td>Normal — click Advanced → Accept risk in Firefox or Proceed in Chrome</td>
+            </tr>
+            <tr>
+                <td>Login page loads but login fails</td>
+                <td>Wrong kubeadmin password</td>
+                <td>Get correct password: <code>oc extract secret/kubeadmin -n kube-system --to=-</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Appendix B — Quick Reference Commands</h2>
+
+    <h3>B.1 Essential Daily oc Commands</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Command</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Check node status</td>
+                <td><code>oc get nodes</code></td>
+            </tr>
+            <tr>
+                <td>Check all cluster operators</td>
+                <td><code>oc get co</code></td>
+            </tr>
+            <tr>
+                <td>Find degraded operators</td>
+                <td><code>oc get co | grep -v 'True.*False.*False'</code></td>
+            </tr>
+            <tr>
+                <td>List pods in a namespace</td>
+                <td><code>oc get pods -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Describe a failing pod</td>
+                <td><code>oc describe pod &lt;pod-name&gt; -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>View pod logs</td>
+                <td><code>oc logs &lt;pod-name&gt; -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Follow live logs</td>
+                <td><code>oc logs -f &lt;pod-name&gt; -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Get OCP version</td>
+                <td><code>oc get clusterversion</code></td>
+            </tr>
+            <tr>
+                <td>List storage classes</td>
+                <td><code>oc get storageclass</code></td>
+            </tr>
+            <tr>
+                <td>List persistent volumes</td>
+                <td><code>oc get pv</code></td>
+            </tr>
+            <tr>
+                <td>List all PVCs</td>
+                <td><code>oc get pvc -A</code></td>
+            </tr>
+            <tr>
+                <td>Get all resources in namespace</td>
+                <td><code>oc get all -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Check resource usage</td>
+                <td><code>oc adm top nodes</code></td>
+            </tr>
+            <tr>
+                <td>Check pod resource usage</td>
+                <td><code>oc adm top pods -n &lt;namespace&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Get kubeadmin password</td>
+                <td><code>oc extract secret/kubeadmin -n kube-system --to=-</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B.2 Important Namespaces</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Namespace</th>
+                <th>What's There</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>openshift-etcd</code></td>
+                <td>etcd database (cluster state storage)</td>
+            </tr>
+            <tr>
+                <td><code>openshift-apiserver</code></td>
+                <td>OCP API server pods</td>
+            </tr>
+            <tr>
+                <td><code>openshift-controller-manager</code></td>
+                <td>OCP controller manager</td>
+            </tr>
+            <tr>
+                <td><code>openshift-ingress</code></td>
+                <td>HAProxy router pods (handles all app routes)</td>
+            </tr>
+            <tr>
+                <td><code>openshift-dns</code></td>
+                <td>CoreDNS pods (internal cluster DNS)</td>
+            </tr>
+            <tr>
+                <td><code>openshift-image-registry</code></td>
+                <td>Internal container image registry</td>
+            </tr>
+            <tr>
+                <td><code>openshift-storage</code></td>
+                <td>LVM Storage Operator pods</td>
+            </tr>
+            <tr>
+                <td><code>openshift-monitoring</code></td>
+                <td>Prometheus, Alertmanager, Grafana</td>
+            </tr>
+            <tr>
+                <td><code>openshift-console</code></td>
+                <td>OCP web console pod</td>
+            </tr>
+            <tr>
+                <td><code>openshift-marketplace</code></td>
+                <td>Operator catalog sources</td>
+            </tr>
+            <tr>
+                <td><code>kube-system</code></td>
+                <td>Core Kubernetes system secrets</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B.3 Key URLs</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>https://console.redhat.com/openshift</td>
+                <td>Red Hat Assisted Installer</td>
+            </tr>
+            <tr>
+                <td>https://console-openshift-console.apps.sno.mas.local</td>
+                <td>OCP Web Console</td>
+            </tr>
+            <tr>
+                <td>https://api.sno.mas.local:6443</td>
+                <td>OCP API endpoint</td>
+            </tr>
+            <tr>
+                <td>https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/</td>
+                <td>OCP 4.16 Documentation</td>
+            </tr>
+            <tr>
+                <td>https://ibm-mas-manage.github.io/sno/</td>
+                <td>IBM MAS SNO Guide (next phase)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B.4 Files You Should Have When SNO is Complete</h3>
+    <p>The following table:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>Location on Bastion</th>
+                <th>What It's For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>kubeconfig</td>
+                <td>~/.kube/config</td>
+                <td>Authenticates oc commands to your OCP cluster</td>
+            </tr>
+            <tr>
+                <td>pull-secret.json</td>
+                <td>~/sno-install/pull-secret.json</td>
+                <td>Needed for MAS installation in Phase 2</td>
+            </tr>
+            <tr>
+                <td>sno_key (private SSH)</td>
+                <td>~/.ssh/sno_key</td>
+                <td>SSH access to the node</td>
+            </tr>
+            <tr>
+                <td>sno_key.pub (public SSH)</td>
+                <td>~/.ssh/sno_key.pub</td>
+                <td>Keep for reference</td>
+            </tr>
+            <tr>
+                <td>dnsmasq.conf</td>
+                <td>/etc/dnsmasq.conf</td>
+                <td>Your DNS configuration</td>
+            </tr>
+            <tr>
+                <td>kubeadmin password</td>
+                <td>Write in a secure note</td>
+                <td>OCP admin login — change after production setup</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 style="margin-top: 3rem; text-align: center;">RHOCP / SNO Installation Complete — Ready for IBM MAS Phase 2</h3>
+    <p style="text-align: center; color: var(--text-muted);">Dell OptiPlex 5080 | Single Node OpenShift | June 2026</p>
+</div>
+
+</body>
+</html>

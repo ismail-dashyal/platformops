@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Engineering | Mass Installation</title>
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-sidebar: #f7f7f8;      
+            --bg-main: #ffffff;         
+            --text-main: #000000;       
+            --text-muted: #444746;      /* Slightly darker for better readability */
+            --accent-bg: #e3e3e3;       /* Highlight color matching the screenshot */
+            --accent-text: #1f1f1f;     
+            --border: #e5e5e5;          
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevents the main window from scrolling */
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            flex-shrink: 0;
+        }
+
+        .logo-section {
+            padding: 1rem 0.5rem 1.5rem 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-section h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .logo-section span {
+            color: #0b57d0; /* Blue accent for Ops */
+        }
+
+        /* Navigation List */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto; 
+        }
+
+        .nav-section-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 1rem 0 0.5rem 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center; /* Centered for a single line look */
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 50px; /* Pill shape like the screenshot */
+            text-decoration: none;
+            color: var(--text-main);
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        /* Active state for the clicked tab */
+        .nav-item.active {
+            background-color: var(--accent-bg);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--text-main);
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adds ... if text is too long */
+        }
+
+        /* Submenu styles */
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sub-menu {
+            display: none;
+            margin-left: 1.5rem;
+            margin-top: 4px;
+        }
+
+        .nav-group.open .sub-menu {
+            display: block;
+        }
+
+        .nav-item.sub-item {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+        }
+
+        .nav-chev {
+            margin-left: auto;
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+        /* --- Main Content Area --- */
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-main);
+        }
+
+        /* The iframe acts as the window for your right-side content */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <header class="logo-section">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <h1>Platform<span>Ops</span></h1>
+        </header>
+
+        <nav class="nav-menu">
+            <div class="nav-section-title">Modules</div>
+            
+            <a href="MAS Infra.html" target="content-frame" class="nav-item">
+                <div class="nav-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                </div>
+                <span class="nav-title">Core Infrastructure</span>
+            </a>
+
+            <a href="MAS Learning Path.html" target="content-frame" class="nav-item">
+                <div class="nav-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                </div>
+                <span class="nav-title">MAS Learning Path</span>
+            </a>
+
+            <div class="nav-group">
+                <a href="RHOCP on Bare Metal Guide.html" target="content-frame" class="nav-item nav-parent">
+                    <div class="nav-icon">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <span class="nav-title">SNO Installation Guide</span>
+                    <div class="nav-chev" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path></svg>
+                    </div>
+                </a>
+                <div class="sub-menu">
+                    <a href="RHOCP Master guide.html" target="content-frame" class="nav-item sub-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                        </div>
+                        <span class="nav-title">SNO Installation Guide</span>
+                    </a>
+
+                    <a href="RHOCP on Bare Metal Guide.html" target="content-frame" class="nav-item sub-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                        </div>
+                        <span class="nav-title">SNO Cheat Sheet</span>
+                    </a>
+
+                    
+                </div>
+            </div>
+
+            <!-- <a href="Access.html" target="content-frame" class="nav-item">
+                <div class="nav-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <span class="nav-title">Access & Data Management</span>
+            </a> -->
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <iframe name="content-frame" src="about:blank"></iframe>
+    </main>
+
+    <script>
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Clear active state from all items
+                navItems.forEach(nav => nav.classList.remove('active'));
+
+                // If this is a parent item, toggle its submenu instead of navigating
+                if (this.classList.contains('nav-parent')) {
+                    e.preventDefault();
+                    const group = this.parentElement;
+                    // Close other groups
+                    document.querySelectorAll('.nav-group').forEach(g => {
+                        if (g !== group) g.classList.remove('open');
+                    });
+                    group.classList.toggle('open');
+                    this.classList.add('active');
+                    return;
+                }
+
+                // For regular items (including sub-items), activate and ensure parent is open
+                this.classList.add('active');
+                const group = this.closest('.nav-group');
+                if (group) {
+                    document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+                    group.classList.add('open');
+                    const parentLink = group.querySelector('.nav-parent');
+                    if (parentLink) parentLink.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

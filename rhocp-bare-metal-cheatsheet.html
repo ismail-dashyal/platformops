@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNO Master Installation Checklist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --primary-color: #ee0000; /* Red Hat Red */
+            --primary-dark: #cc0000;
+            --accent-color: #0268ce;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --note-bg: #f0f6ff;
+            --note-border: #3b82f6;
+            --note-text: #1e3a8a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .page-header {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 40px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .intro {
+            font-size: 1.15rem;
+            color: #475569;
+            margin: 0;
+        }
+
+        .intro strong {
+            color: var(--primary-dark);
+        }
+
+        /* Card Styles */
+        .phase-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .phase-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .phase-header {
+            background-color: #f8fafc;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            color: var(--accent-color);
+            font-size: 1.3rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .phase-body {
+            padding: 30px;
+        }
+
+        /* List and Layout Styles */
+        .task-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .task-label {
+            min-width: 140px;
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        ol {
+            margin-top: 10px;
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+
+        ol > li {
+            margin-bottom: 12px;
+            padding-left: 8px;
+        }
+
+        ol > li::marker {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        ul.nested-list {
+            margin-top: 10px;
+            list-style-type: disc;
+            color: var(--text-muted);
+        }
+
+        /* Code Styles */
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--code-bg);
+            color: #38bdf8;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            word-break: break-word;
+        }
+
+        /* Note Styles */
+        .note {
+            background-color: var(--note-bg);
+            padding: 20px;
+            border-left: 4px solid var(--note-border);
+            margin: 25px 30px 30px 30px;
+            border-radius: 0 8px 8px 0;
+            color: var(--note-text);
+            font-size: 0.95rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        .note strong {
+            color: #1e40af;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .task-group {
+                flex-direction: column;
+            }
+            .task-label {
+                margin-bottom: 8px;
+            }
+            .page-header {
+                padding: 25px;
+            }
+            .phase-body {
+                padding: 20px;
+            }
+            .note {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="page-header">
+            <h1>Master Checklist: Single Node OpenShift (SNO)</h1>
+            <p class="intro">Here is your definitive, master checklist for installing a Single Node OpenShift (SNO) bare-metal cluster on your Dell OptiPlex 5080.<br><br>
+            <strong>If you follow these instructions precisely, you will not need any outside documentation.</strong></p>
+        </div>
+
+        <!-- Phase 1 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 1: Hardware Preparation (The Wipe)</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Prepare the Dell OptiPlex 5080 for total data destruction. You explicitly do not want backups, so we will allow the installer to completely overwrite the disk.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">Physically on the Dell OptiPlex 5080.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li>Unplug any external USB drives or secondary hard drives attached to the OptiPlex.</li>
+                            <li>Leave only the target 477 GB SSD installed inside the machine.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    You do not need to manually format the drive beforehand. The Red Hat CoreOS (RHCOS) installer will automatically wipe the partitions, destroy Windows and Kali, and format the drive for OpenShift during Phase 6.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 2: Gather Prerequisites</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Collect the necessary files, credentials, and physical media required for the installation.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">On your separate Linux machine (the "Bastion Host") and a web browser.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li><strong>USB Drive:</strong> Locate an 8 GB or larger USB flash drive. Plug it into your Bastion Host.</li>
+                            <li><strong>Red Hat Account:</strong> Create or log into a free developer account at <code>console.redhat.com</code>.</li>
+                            <li><strong>Pull Secret:</strong> Navigate to <strong>OpenShift</strong> > <strong>Downloads</strong> in the Red Hat console. Click <strong>Download pull secret</strong> and save the <code>pull-secret.json</code> file to your Bastion Host.</li>
+                            <li><strong>SSH Key:</strong> Open a terminal on your Bastion Host and type <code>ssh-keygen -t ed25519 -C "mas-admin"</code>. Press <strong>Enter</strong> through all prompts to accept the default file location (<code>~/.ssh/id_ed25519</code>) and leave the passphrase empty.</li>
+                            <li><strong>Retrieve Public Key:</strong> Type <code>cat ~/.ssh/id_ed25519.pub</code> and copy the output. You will need this later.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    An empty passphrase on your SSH key is acceptable for this setup, as it allows seamless automation and access if you need to troubleshoot the node later.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 3: Configure Network & DNS (The Critical Gateway)</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Assign a static IP to the OptiPlex and route DNS traffic to it.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">Your network router and your local DNS server (e.g., dnsmasq on your Bastion Host).</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li><strong>Static IP:</strong> Log into your router, find the MAC address of the OptiPlex, and assign it a permanent IP (e.g., <code>192.168.1.50</code>).</li>
+                            <li><strong>DNS Records:</strong> On your Bastion Host (assuming dnsmasq is installed), edit <code>/etc/dnsmasq.conf</code> and add:
+                                <ul class="nested-list">
+                                    <li><code>address=/api.sno.mas.local/192.168.1.50</code></li>
+                                    <li><code>address=/api-int.sno.mas.local/192.168.1.50</code></li>
+                                    <li><code>address=/.apps.sno.mas.local/192.168.1.50</code></li>
+                                </ul>
+                            </li>
+                            <li><strong>Restart DNS:</strong> Run <code>sudo systemctl restart dnsmasq</code>.</li>
+                            <li><strong>Verify:</strong> Run <code>ping api.sno.mas.local</code>. It must return <code>192.168.1.50</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    If ping fails, STOP. Do not proceed to Phase 4 until your DNS correctly resolves to the OptiPlex's IP.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 4: Prepare the Bastion Host Tools</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Install the command-line tools you need to interact with the cluster once it is built.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">The terminal of your Bastion Host.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li>Go to <code>console.redhat.com/openshift/downloads</code>.</li>
+                            <li>Under "OpenShift Command Line Interface (oc)", download the Linux binary.</li>
+                            <li>Extract the file: <code>tar -xvf openshift-client-linux.tar.gz</code>.</li>
+                            <li>Move the binaries to your system path: <code>sudo mv oc kubectl /usr/local/bin/</code>.</li>
+                            <li>Verify installation: <code>oc version</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    The <code>oc</code> tool is the OpenShift equivalent of <code>kubectl</code>. You will use it for everything post-installation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 5: Generate and Flash the Installer ISO</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Define your cluster in the Red Hat portal and create the bootable installation media.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">Web browser (<code>console.redhat.com</code>) and your Bastion Host.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li>Log into <code>console.redhat.com/openshift</code>, click <strong>Create cluster</strong>, go to the <strong>Datacenter</strong> tab, and select <strong>Assisted Installer</strong>.</li>
+                            <li><strong>Cluster Details:</strong> Name the cluster <code>sno</code>. Set the base domain to <code>mas.local</code>. Select <strong>x86_64</strong>. Check the box for <strong>Install single node OpenShift (SNO)</strong>.</li>
+                            <li><strong>Operators:</strong> Skip adding additional operators (like OpenShift Virtualization) for now to save resources. Click Next.</li>
+                            <li><strong>Host Discovery:</strong> Paste the contents of your <code>pull-secret.json</code> into the pull secret box. Paste your SSH public key (<code>id_ed25519.pub</code>) into the SSH box.</li>
+                            <li><strong>Generate ISO:</strong> Click <strong>Generate Discovery ISO</strong>. Select <strong>Full image file</strong>. Click Generate and download the ISO to your Bastion Host.</li>
+                            <li><strong>Flash the USB:</strong> Find your USB drive identifier (e.g., <code>/dev/sdb</code> or <code>/dev/sdc</code>) using the <code>lsblk</code> command. Run <code>sudo dd if=path/to/downloaded.iso of=/dev/sdX bs=4M status=progress</code> (Replace <code>sdX</code> with your actual USB drive letter).</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    Triple-check your <code>dd</code> command target. Choosing the wrong <code>/dev/sdX</code> will overwrite your Bastion Host's operating system.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 6 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 6: Boot and Install</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Boot the OptiPlex using the USB drive and initiate the automated installation.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">Physically on the OptiPlex, then back to the Assisted Installer web browser.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li>Insert the flashed USB drive into the OptiPlex. Power it on and press F12 (or F2) repeatedly to enter the boot menu.</li>
+                            <li>Select the USB drive to boot. The screen will show text scrolling as RHCOS Live boots up. Leave the machine alone.</li>
+                            <li>Go back to the <strong>Assisted Installer</strong> web page on your Bastion Host. Within 5–10 minutes, your OptiPlex will appear in the web interface as a discovered host.</li>
+                            <li>Verify the IP address matches your static IP. Change the hostname to <code>sno-master</code> (or whatever you prefer).</li>
+                            <li>Click <strong>Next</strong> to reach the Storage page. Select your 477 GB SSD as the installation disk. Click <strong>Next</strong>.</li>
+                            <li>Review the summary page. All pre-installation checks should be green. Click <strong>Install cluster</strong>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    The OptiPlex will reboot several times. The web console progress bar will track everything. <strong>Do not touch the OptiPlex, unplug the network, or remove the USB until the web console explicitly says the installation is 100% complete.</strong> This takes 45 to 60 minutes.
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 7 -->
+        <div class="phase-card">
+            <div class="phase-header">
+                <h3>Phase 7: Verification and Hand-off</h3>
+            </div>
+            <div class="phase-body">
+                <div class="task-group">
+                    <div class="task-label">What to do:</div>
+                    <div class="task-content">Confirm the cluster is alive and authenticate as the administrator.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">Where to do it:</div>
+                    <div class="task-content">The terminal of your Bastion Host.</div>
+                </div>
+                <div class="task-group">
+                    <div class="task-label">How to do it:</div>
+                    <div class="task-content">
+                        <ol>
+                            <li>Once the web console says "Cluster installed successfully," it will provide a link to download your <code>kubeconfig</code> file and display a <code>kubeadmin</code> username and password.</li>
+                            <li>Download the <code>kubeconfig</code> file to your Bastion Host.</li>
+                            <li>In your terminal, point your <code>oc</code> tool to that file by running: <code>export KUBECONFIG=/path/to/your/downloaded/kubeconfig</code>.</li>
+                            <li>Run <code>oc get nodes</code>.</li>
+                            <li>Run <code>oc get clusteroperators</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="note">
+                <div>
+                    <strong>What to keep in mind:</strong>
+                    When you run <code>oc get nodes</code>, your single node must show a status of <strong>Ready</strong>. When you run <code>oc get clusteroperators</code>, all operators should eventually show <code>AVAILABLE: True</code>, <code>PROGRESSING: False</code>, and <code>DEGRADED: False</code>. If they are still progressing, simply wait another 10 minutes. Your cluster is now fully operational.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
