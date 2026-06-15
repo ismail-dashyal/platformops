@@ -134,172 +134,172 @@
 <body>
 
 <div class="container">
-    <h1 id="mas-lab-deployment-corrected-master-plan">MAS Lab Deployment — Corrected Master Plan[cite: 4]</h1>
+    <h1 id="mas-lab-deployment-corrected-master-plan">MAS Lab Deployment — Corrected Master Plan</h1>
     
-    <h2 id="hardware-allocation-strategy">Hardware Allocation Strategy[cite: 4]</h2>
+    <h2 id="hardware-allocation-strategy">Hardware Allocation Strategy</h2>
     
-    <h3 id="node-1-the-sno-engine-ryzen-9-256gb-ram-">Node 1: The SNO Engine (Ryzen 9 / 256GB RAM)[cite: 4]</h3>
+    <h3 id="node-1-the-sno-engine-ryzen-9-256gb-ram-">Node 1: The SNO Engine (Ryzen 9 / 256GB RAM)</h3>
     <ul>
-        <li><strong>500GB SSD</strong>: Dedicated to Red Hat Enterprise Linux CoreOS (RHCOS).[cite: 4] Holds the OpenShift control plane, etcd state, and container image registry.[cite: 4]</li>
-        <li><strong>1TB SSD</strong>: Left raw during installation, later claimed by the Local Storage Operator (LSO) for high-speed RWO storage (Db2, Kafka/UDS).[cite: 4]</li>
-        <li><strong>RTX 5070</strong>: Optional passthrough via the NVIDIA GPU Operator for MAS Visual Inspection.[cite: 4] <strong>Note</strong>: the GPU Operator requires the <strong>Node Feature Discovery (NFD) Operator</strong> as a prerequisite — install NFD first, or the GPU Operator install will fail to detect hardware.[cite: 4]</li>
-        <li><strong>Workload</strong>: OpenShift Container Platform, MAS Operator, Suite License Service (SLS), Db2 container, MongoDB (internal operator, recommended for SNO — see note below), and Maximo Manage application pods.[cite: 4]</li>
+        <li><strong>500GB SSD</strong>: Dedicated to Red Hat Enterprise Linux CoreOS (RHCOS). Holds the OpenShift control plane, etcd state, and container image registry.</li>
+        <li><strong>1TB SSD</strong>: Left raw during installation, later claimed by the Local Storage Operator (LSO) for high-speed RWO storage (Db2, Kafka/UDS).</li>
+        <li><strong>RTX 5070</strong>: Optional passthrough via the NVIDIA GPU Operator for MAS Visual Inspection. <strong>Note</strong>: the GPU Operator requires the <strong>Node Feature Discovery (NFD) Operator</strong> as a prerequisite — install NFD first, or the GPU Operator install will fail to detect hardware.</li>
+        <li><strong>Workload</strong>: OpenShift Container Platform, MAS Operator, Suite License Service (SLS), Db2 container, MongoDB (internal operator, recommended for SNO — see note below), and Maximo Manage application pods.</li>
     </ul>
     
     <blockquote>
-        <p><strong>Sizing note</strong>: 256GB RAM is generous, but a full MAS stack (Core, Manage, Db2, Kafka/UDS, Cert-Manager, MongoDB) on a single-node cluster is resource-tight in practice.[cite: 4] SNO is officially supported for MAS but has known limits on pod density and etcd performance under heavy churn.[cite: 4] Monitor <code>oc adm top nodes</code> and etcd health during install; a compact (3-node) cluster is the recommended baseline if you hit instability.[cite: 4]</p>
+        <p><strong>Sizing note</strong>: 256GB RAM is generous, but a full MAS stack (Core, Manage, Db2, Kafka/UDS, Cert-Manager, MongoDB) on a single-node cluster is resource-tight in practice. SNO is officially supported for MAS but has known limits on pod density and etcd performance under heavy churn. Monitor <code>oc adm top nodes</code> and etcd health during install; a compact (3-node) cluster is the recommended baseline if you hit instability.</p>
     </blockquote>
     
-    <h3 id="node-2-the-infrastructure-bastion-i7-32gb-ram-477gb-storage-">Node 2: The Infrastructure Bastion (i7 / 32GB RAM / 477GB Storage)[cite: 4]</h3>
+    <h3 id="node-2-the-infrastructure-bastion-i7-32gb-ram-477gb-storage-">Node 2: The Infrastructure Bastion (i7 / 32GB RAM / 477GB Storage)</h3>
     <ul>
-        <li><strong>OS</strong>: Ubuntu Server 22.04 LTS or RHEL 9.[cite: 4]</li>
-        <li><strong>The Traffic Cop</strong>: Runs dnsmasq and HAProxy to route all <code>.apps.sno.mas.lab</code> traffic into the SNO.[cite: 4]</li>
-        <li><strong>Shared Storage</strong>: NFS server providing the RWX storage class for Maximo attachments and logs.[cite: 4]</li>
-        <li><strong>Optional services</strong> (not mandatory for MAS, but supported choices): external MongoDB 7.0 replica set and OpenLDAP, if you prefer to externalize them rather than use MAS's bundled operators.[cite: 4] See clarification below.[cite: 4]</li>
+        <li><strong>OS</strong>: Ubuntu Server 22.04 LTS or RHEL 9.</li>
+        <li><strong>The Traffic Cop</strong>: Runs dnsmasq and HAProxy to route all <code>.apps.sno.mas.lab</code> traffic into the SNO.</li>
+        <li><strong>Shared Storage</strong>: NFS server providing the RWX storage class for Maximo attachments and logs.</li>
+        <li><strong>Optional services</strong> (not mandatory for MAS, but supported choices): external MongoDB 7.0 replica set and OpenLDAP, if you prefer to externalize them rather than use MAS's bundled operators. See clarification below.</li>
     </ul>
     
     <blockquote>
-        <p><strong>MongoDB clarification</strong>: MAS 9.x installs and manages its <strong>own internal MongoDB operator by default</strong>, which is the standard path for SNO.[cite: 4] External MongoDB is only needed for specific HA/multi-cluster topologies or if you explicitly opt out of the bundled instance during Suite CR configuration.[cite: 4] Treat external MongoDB as an <em>architectural option</em>, not a hard requirement.[cite: 4]</p>
-        <p><strong>OpenLDAP clarification</strong>: LDAP integration is <strong>optional</strong>.[cite: 4] MAS Suite UI can use OpenShift's built-in OAuth (htpasswd, etc.) or App Connect-based identity providers for a lab environment.[cite: 4] Only deploy OpenLDAP if you specifically want enterprise-style directory-based user management.[cite: 4]</p>
+        <p><strong>MongoDB clarification</strong>: MAS 9.x installs and manages its <strong>own internal MongoDB operator by default</strong>, which is the standard path for SNO. External MongoDB is only needed for specific HA/multi-cluster topologies or if you explicitly opt out of the bundled instance during Suite CR configuration. Treat external MongoDB as an <em>architectural option</em>, not a hard requirement.</p>
+        <p><strong>OpenLDAP clarification</strong>: LDAP integration is <strong>optional</strong>. MAS Suite UI can use OpenShift's built-in OAuth (htpasswd, etc.) or App Connect-based identity providers for a lab environment. Only deploy OpenLDAP if you specifically want enterprise-style directory-based user management.</p>
     </blockquote>
     
-    <p>The RLKS (Rational License Key Server) runs inside a dedicated VM on the i7 bastion to preserve the existing host ID / MAC address binding tied to your IBM license, avoiding a rehost.[cite: 4]</p>
-    <p>The i7 hypervisor must use <strong>Bridged Networking</strong> (not NAT) so the RLKS VM sits directly on the local subnet with its own static IP and licensed MAC address.[cite: 4]</p>
+    <p>The RLKS (Rational License Key Server) runs inside a dedicated VM on the i7 bastion to preserve the existing host ID / MAC address binding tied to your IBM license, avoiding a rehost.</p>
+    <p>The i7 hypervisor must use <strong>Bridged Networking</strong> (not NAT) so the RLKS VM sits directly on the local subnet with its own static IP and licensed MAC address.</p>
     
     <hr>
     
-    <h2 id="phase-1-network-virtualization-pre-flight">Phase 1: Network &amp; Virtualization Pre-Flight[cite: 4]</h2>
+    <h2 id="phase-1-network-virtualization-pre-flight">Phase 1: Network &amp; Virtualization Pre-Flight</h2>
     <table>
         <thead>
             <tr>
-                <th>Component[cite: 4]</th>
-                <th>Address[cite: 4]</th>
+                <th>Component</th>
+                <th>Address</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Subnet[cite: 4]</td>
-                <td>192.168.0.0/24[cite: 4]</td>
+                <td>Subnet</td>
+                <td>192.168.0.0/24</td>
             </tr>
             <tr>
-                <td>Gateway / Router[cite: 4]</td>
-                <td>192.168.0.1[cite: 4]</td>
+                <td>Gateway / Router</td>
+                <td>192.168.0.1</td>
             </tr>
             <tr>
-                <td>Ryzen SNO Node[cite: 4]</td>
-                <td>192.168.0.20[cite: 4]</td>
+                <td>Ryzen SNO Node</td>
+                <td>192.168.0.20</td>
             </tr>
             <tr>
-                <td>i7 Bastion Host OS[cite: 4]</td>
-                <td>192.168.0.10[cite: 4]</td>
+                <td>i7 Bastion Host OS</td>
+                <td>192.168.0.10</td>
             </tr>
             <tr>
-                <td>RLKS Virtual Machine[cite: 4]</td>
-                <td>192.168.0.11[cite: 4]</td>
+                <td>RLKS Virtual Machine</td>
+                <td>192.168.0.11</td>
             </tr>
             <tr>
-                <td>Base Domain[cite: 4]</td>
-                <td>sno.mas.lab[cite: 4]</td>
+                <td>Base Domain</td>
+                <td>sno.mas.lab</td>
             </tr>
         </tbody>
     </table>
     
-    <p><strong>Critical</strong>: In the i7 hypervisor (KVM/QEMU, VirtualBox, or VMware), edit the RLKS VM's network adapter to <strong>Bridged mode</strong> and manually set the MAC address to match the one your <code>license.dat</code> is tied to.[cite: 4]</p>
+    <p><strong>Critical</strong>: In the i7 hypervisor (KVM/QEMU, VirtualBox, or VMware), edit the RLKS VM's network adapter to <strong>Bridged mode</strong> and manually set the MAC address to match the one your <code>license.dat</code> is tied to.</p>
     
     <hr>
     
-    <h2 id="phase-2-building-the-i7-infrastructure-bastion">Phase 2: Building the i7 Infrastructure Bastion[cite: 4]</h2>
+    <h2 id="phase-2-building-the-i7-infrastructure-bastion">Phase 2: Building the i7 Infrastructure Bastion</h2>
     
-    <h3 id="1-hypervisor-rlks-vm">1. Hypervisor &amp; RLKS VM[cite: 4]</h3>
+    <h3 id="1-hypervisor-rlks-vm">1. Hypervisor &amp; RLKS VM</h3>
     <ul>
-        <li>Install hypervisor packages (<code>qemu-kvm</code>, <code>libvirt-daemon-system</code>, <code>virt-manager</code>).[cite: 4]</li>
-        <li>Launch/import the existing RLKS VM.[cite: 4] Confirm it binds to the bridged interface, takes static IP <code>192.168.0.11</code>, and can ping both the host (<code>192.168.0.10</code>) and the router.[cite: 4]</li>
-        <li>Confirm RLKS is listening on <strong>port 27000</strong> (<code>lmgrd</code>).[cite: 4] Port 27001 (<code>ibmratl</code>) is internal vendor-daemon traffic on the same host and generally doesn't need to be exposed externally — open it only if your specific license configuration requires direct vendor-daemon access.[cite: 4] Open required ports on the VM's internal firewall.[cite: 4]</li>
+        <li>Install hypervisor packages (<code>qemu-kvm</code>, <code>libvirt-daemon-system</code>, <code>virt-manager</code>).</li>
+        <li>Launch/import the existing RLKS VM. Confirm it binds to the bridged interface, takes static IP <code>192.168.0.11</code>, and can ping both the host (<code>192.168.0.10</code>) and the router.</li>
+        <li>Confirm RLKS is listening on <strong>port 27000</strong> (<code>lmgrd</code>). Port 27001 (<code>ibmratl</code>) is internal vendor-daemon traffic on the same host and generally doesn't need to be exposed externally — open it only if your specific license configuration requires direct vendor-daemon access. Open required ports on the VM's internal firewall.</li>
     </ul>
     
-    <h3 id="2-host-os-networking-services">2. Host OS Networking Services[cite: 4]</h3>
+    <h3 id="2-host-os-networking-services">2. Host OS Networking Services</h3>
     <ul>
-        <li><strong>DNS (dnsmasq)</strong> on <code>192.168.0.10</code>: serve <code>api.sno.mas.lab</code>, <code>api-int.sno.mas.lab</code>, and wildcard <code>*.apps.sno.mas.lab</code>, all pointing to <code>192.168.0.10</code>.[cite: 4] Open port 53 (UDP/TCP).[cite: 4] Double-check the <code>api-int</code> record matches the exact node hostname set during ISO generation — mismatches here are a common cause of bootstrap hangs.[cite: 4]</li>
-        <li><strong>HAProxy</strong>: frontend on ports 80, 443, 6443, 22623, all backending to the SNO at <code>192.168.0.20</code>.[cite: 4] Open these ports on the host firewall.[cite: 4]</li>
+        <li><strong>DNS (dnsmasq)</strong> on <code>192.168.0.10</code>: serve <code>api.sno.mas.lab</code>, <code>api-int.sno.mas.lab</code>, and wildcard <code>*.apps.sno.mas.lab</code>, all pointing to <code>192.168.0.10</code>. Open port 53 (UDP/TCP). Double-check the <code>api-int</code> record matches the exact node hostname set during ISO generation — mismatches here are a common cause of bootstrap hangs.</li>
+        <li><strong>HAProxy</strong>: frontend on ports 80, 443, 6443, 22623, all backending to the SNO at <code>192.168.0.20</code>. Open these ports on the host firewall.</li>
     </ul>
     
-    <h3 id="3-host-os-containerized-core-services-as-needed-">3. Host OS Containerized Core Services (as needed)[cite: 4]</h3>
+    <h3 id="3-host-os-containerized-core-services-as-needed-">3. Host OS Containerized Core Services (as needed)</h3>
     <ul>
-        <li><strong>NFS Shared Storage Vault</strong> (required): <code>nfs-kernel-server</code>, export path <code>/var/nfs/mas_rwx</code>, entry <code>/var/nfs/mas_rwx *(rw,sync,no_subtree_check,no_root_squash)</code> in <code>/etc/exports</code>, then <code>exportfs -ra</code>.[cite: 4] Open port 2049.[cite: 4]</li>
-        <li><strong>External MongoDB 7.0</strong> (optional, only if not using MAS's internal Mongo operator): deploy via Docker/Podman with <code>--replSet rs0</code>, then run <code>rs.initiate()</code> in <code>mongosh</code>.[cite: 4] Open port 27017.[cite: 4]</li>
-        <li><strong>OpenLDAP</strong> (optional): deploy via container (e.g., Bitnami), pre-populate an OU for Maximo admins/users.[cite: 4] Open ports 389 and 636.[cite: 4]</li>
-    </ul>
-    
-    <hr>
-    
-    <h2 id="phase-3-ryzen-sno-node-installation">Phase 3: Ryzen SNO Node Installation[cite: 4]</h2>
-    <ul>
-        <li><strong>Red Hat Assisted Installer</strong>: generate a Single Node OpenShift Discovery ISO via console.redhat.com.[cite: 4] Cluster name <code>sno</code>, base domain <code>mas.lab</code>.[cite: 4] Set DNS to <code>192.168.0.10</code>.[cite: 4]</li>
-        <li><strong>Targeted Disk Selection</strong>: select only the 500GB SSD as the install target.[cite: 4] Leave the 1TB SSD raw and unformatted.[cite: 4]</li>
-        <li><strong>Trigger Installation</strong>: write RHCOS, bootstrap the cluster, remove the USB on restart.[cite: 4]</li>
+        <li><strong>NFS Shared Storage Vault</strong> (required): <code>nfs-kernel-server</code>, export path <code>/var/nfs/mas_rwx</code>, entry <code>/var/nfs/mas_rwx *(rw,sync,no_subtree_check,no_root_squash)</code> in <code>/etc/exports</code>, then <code>exportfs -ra</code>. Open port 2049.</li>
+        <li><strong>External MongoDB 7.0</strong> (optional, only if not using MAS's internal Mongo operator): deploy via Docker/Podman with <code>--replSet rs0</code>, then run <code>rs.initiate()</code> in <code>mongosh</code>. Open port 27017.</li>
+        <li><strong>OpenLDAP</strong> (optional): deploy via container (e.g., Bitnami), pre-populate an OU for Maximo admins/users. Open ports 389 and 636.</li>
     </ul>
     
     <hr>
     
-    <h2 id="phase-4-ibm-entitlement-key-pull-secret-previously-missing-">Phase 4: IBM Entitlement Key &amp; Pull Secret (previously missing)[cite: 4]</h2>
-    <p>Before installing any IBM operators (SLS, UDS, Db2, MAS), configure image pull access:[cite: 4]</p>
+    <h2 id="phase-3-ryzen-sno-node-installation">Phase 3: Ryzen SNO Node Installation</h2>
     <ul>
-        <li>Generate an <strong>IBM Entitlement Key</strong> from container.softwarewarranty / MyIBM.[cite: 4]</li>
-        <li>Create/update the global pull secret (or a namespace-scoped <code>ibm-entitlement-key</code> secret) with <code>cp.icr.io</code> credentials using the entitlement key as the password.[cite: 4]</li>
-        <li>Verify operator catalog sources for IBM Operator Catalog and Cert-Manager are configured in OperatorHub.[cite: 4]</li>
+        <li><strong>Red Hat Assisted Installer</strong>: generate a Single Node OpenShift Discovery ISO via console.redhat.com. Cluster name <code>sno</code>, base domain <code>mas.lab</code>. Set DNS to <code>192.168.0.10</code>.</li>
+        <li><strong>Targeted Disk Selection</strong>: select only the 500GB SSD as the install target. Leave the 1TB SSD raw and unformatted.</li>
+        <li><strong>Trigger Installation</strong>: write RHCOS, bootstrap the cluster, remove the USB on restart.</li>
     </ul>
-    <p>Without this step, IBM operator images will fail to pull and all later phases will stall.[cite: 4]</p>
     
     <hr>
     
-    <h2 id="phase-5-cluster-storage-allocation">Phase 5: Cluster Storage Allocation[cite: 4]</h2>
+    <h2 id="phase-4-ibm-entitlement-key-pull-secret-previously-missing-">Phase 4: IBM Entitlement Key &amp; Pull Secret (previously missing)</h2>
+    <p>Before installing any IBM operators (SLS, UDS, Db2, MAS), configure image pull access:</p>
     <ul>
-        <li><strong>Local Storage Class (RWO)</strong>: install the Local Storage Operator (LSO) from OperatorHub.[cite: 4] Create a <code>LocalVolume</code> targeting the raw 1TB NVMe drive, producing storage class <code>local-sc</code> for Db2 and Kafka/UDS.[cite: 4]</li>
-        <li><strong>NFS Storage Class (RWX)</strong>: deploy <code>nfs-subdir-external-provisioner</code> via Helm, pointing to <code>192.168.0.10</code> and <code>/var/nfs/mas_rwx</code>.[cite: 4] Name it <code>nfs-client</code>.[cite: 4]</li>
+        <li>Generate an <strong>IBM Entitlement Key</strong> from container.softwarewarranty / MyIBM.</li>
+        <li>Create/update the global pull secret (or a namespace-scoped <code>ibm-entitlement-key</code> secret) with <code>cp.icr.io</code> credentials using the entitlement key as the password.</li>
+        <li>Verify operator catalog sources for IBM Operator Catalog and Cert-Manager are configured in OperatorHub.</li>
+    </ul>
+    <p>Without this step, IBM operator images will fail to pull and all later phases will stall.</p>
+    
+    <hr>
+    
+    <h2 id="phase-5-cluster-storage-allocation">Phase 5: Cluster Storage Allocation</h2>
+    <ul>
+        <li><strong>Local Storage Class (RWO)</strong>: install the Local Storage Operator (LSO) from OperatorHub. Create a <code>LocalVolume</code> targeting the raw 1TB NVMe drive, producing storage class <code>local-sc</code> for Db2 and Kafka/UDS.</li>
+        <li><strong>NFS Storage Class (RWX)</strong>: deploy <code>nfs-subdir-external-provisioner</code> via Helm, pointing to <code>192.168.0.10</code> and <code>/var/nfs/mas_rwx</code>. Name it <code>nfs-client</code>.</li>
     </ul>
     
     <blockquote>
-        <p><strong>Note</strong>: <code>nfs-subdir-external-provisioner</code> is community-maintained and not a Red Hat-supported CSI driver.[cite: 4] Fine for a lab, but if you later need a support-matched configuration, use Red Hat's supported NFS CSI operator instead.[cite: 4]</p>
+        <p><strong>Note</strong>: <code>nfs-subdir-external-provisioner</code> is community-maintained and not a Red Hat-supported CSI driver. Fine for a lab, but if you later need a support-matched configuration, use Red Hat's supported NFS CSI operator instead.</p>
     </blockquote>
     
     <hr>
     
-    <h2 id="phase-6-ibm-foundational-services-deployment">Phase 6: IBM Foundational Services Deployment[cite: 4]</h2>
+    <h2 id="phase-6-ibm-foundational-services-deployment">Phase 6: IBM Foundational Services Deployment</h2>
     <ul>
-        <li><strong>Cert-Manager</strong>: install the Red Hat Cert-Manager operator for internal certificates.[cite: 4]</li>
-        <li><strong>Suite License Service (SLS)</strong>: install the IBM SLS operator.[cite: 4] Configure it to connect to the RLKS VM via <code>27000@192.168.0.11</code> rather than uploading a license file.[cite: 4]</li>
-        <li><strong>User Data Services (UDS)</strong>: deploy the UDS operator, pointing Kafka stream storage to <code>local-sc</code>.[cite: 4]</li>
-        <li><strong>IBM Db2 Warehouse</strong>: install the Db2 operator.[cite: 4] <strong>Accept the Db2 license</strong> (<code>LICENSE=accept</code> parameter is required during provisioning).[cite: 4] Provision the Maximo Manage database instance with storage bound to <code>local-sc</code>, sized at minimum ~100GB for a representative workload.[cite: 4]</li>
+        <li><strong>Cert-Manager</strong>: install the Red Hat Cert-Manager operator for internal certificates.</li>
+        <li><strong>Suite License Service (SLS)</strong>: install the IBM SLS operator. Configure it to connect to the RLKS VM via <code>27000@192.168.0.11</code> rather than uploading a license file.</li>
+        <li><strong>User Data Services (UDS)</strong>: deploy the UDS operator, pointing Kafka stream storage to <code>local-sc</code>.</li>
+        <li><strong>IBM Db2 Warehouse</strong>: install the Db2 operator. <strong>Accept the Db2 license</strong> (<code>LICENSE=accept</code> parameter is required during provisioning). Provision the Maximo Manage database instance with storage bound to <code>local-sc</code>, sized at minimum ~100GB for a representative workload.</li>
     </ul>
     
     <hr>
     
-    <h2 id="phase-7-maximo-application-suite-setup">Phase 7: Maximo Application Suite Setup[cite: 4]</h2>
+    <h2 id="phase-7-maximo-application-suite-setup">Phase 7: Maximo Application Suite Setup</h2>
     <ul>
-        <li><strong>MAS Operator</strong>: install from the OpenShift catalog.[cite: 4]</li>
-        <li><strong>Suite CR Initialization</strong>:[cite: 4]
+        <li><strong>MAS Operator</strong>: install from the OpenShift catalog.</li>
+        <li><strong>Suite CR Initialization</strong>:
             <ul>
-                <li>If using internal MongoDB (recommended for SNO), allow the MAS operator to provision it automatically — no external database block needed.[cite: 4]</li>
-                <li>If using external MongoDB, point the database block to <code>192.168.0.10:27017</code>.[cite: 4]</li>
-                <li>If using OpenLDAP, configure the user management synchronization block to <code>192.168.0.10:389</code>.[cite: 4] Otherwise, configure OAuth-based identity via OpenShift.[cite: 4]</li>
+                <li>If using internal MongoDB (recommended for SNO), allow the MAS operator to provision it automatically — no external database block needed.</li>
+                <li>If using external MongoDB, point the database block to <code>192.168.0.10:27017</code>.</li>
+                <li>If using OpenLDAP, configure the user management synchronization block to <code>192.168.0.10:389</code>. Otherwise, configure OAuth-based identity via OpenShift.</li>
             </ul>
         </li>
-        <li><strong>Maximo Manage Activation</strong>: open the MAS core dashboard, select "Manage", bind the EAM application to the Db2 instance from Phase 6, and assign persistent storage to <code>nfs-client</code> for attachments, logs, and reports.[cite: 4]</li>
+        <li><strong>Maximo Manage Activation</strong>: open the MAS core dashboard, select "Manage", bind the EAM application to the Db2 instance from Phase 6, and assign persistent storage to <code>nfs-client</code> for attachments, logs, and reports.</li>
     </ul>
     
     <hr>
     
-    <h2 id="summary-of-corrections-from-original-plan">Summary of Corrections from Original Plan[cite: 4]</h2>
+    <h2 id="summary-of-corrections-from-original-plan">Summary of Corrections from Original Plan</h2>
     <ol>
-        <li>Added Phase 4 (Entitlement Key / pull secret) — previously missing entirely and would have blocked all IBM operator installs.[cite: 4]</li>
-        <li>Reframed external MongoDB as optional — MAS 9.x defaults to an internal MongoDB operator on SNO.[cite: 4]</li>
-        <li>Reframed OpenLDAP as optional — OpenShift OAuth is a valid alternative for a lab.[cite: 4]</li>
-        <li>Added Db2 license acceptance (<code>LICENSE=accept</code>) and minimum storage sizing guidance.[cite: 4]</li>
-        <li>Added NFD Operator as a prerequisite for the GPU Operator.[cite: 4]</li>
-        <li>Clarified RLKS port usage (27000 vs 27001).[cite: 4]</li>
-        <li>Added a DNS troubleshooting note re: <code>api-int</code> hostname matching.[cite: 4]</li>
-        <li>Flagged <code>nfs-subdir-external-provisioner</code> as unsupported (community) for production-parity environments.[cite: 4]</li>
-        <li>Added SNO resource-density caution for the full MAS+Db2+UDS stack.[cite: 4]</li>
+        <li>Added Phase 4 (Entitlement Key / pull secret) — previously missing entirely and would have blocked all IBM operator installs.</li>
+        <li>Reframed external MongoDB as optional — MAS 9.x defaults to an internal MongoDB operator on SNO.</li>
+        <li>Reframed OpenLDAP as optional — OpenShift OAuth is a valid alternative for a lab.</li>
+        <li>Added Db2 license acceptance (<code>LICENSE=accept</code>) and minimum storage sizing guidance.</li>
+        <li>Added NFD Operator as a prerequisite for the GPU Operator.</li>
+        <li>Clarified RLKS port usage (27000 vs 27001).</li>
+        <li>Added a DNS troubleshooting note re: <code>api-int</code> hostname matching.</li>
+        <li>Flagged <code>nfs-subdir-external-provisioner</code> as unsupported (community) for production-parity environments.</li>
+        <li>Added SNO resource-density caution for the full MAS+Db2+UDS stack.</li>
     </ol>
 </div>
 
